@@ -1,0 +1,30 @@
+.layout {
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  grid-template-rows: 1fr;
+  gap: 0px 0px;
+  grid-template-areas: "sidebar content";
+}
+
+.sidebar {
+  position: relative;
+  grid-area: sidebar;
+  background: rgba(32, 33, 35);
+
+  max-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+  
+  padding: 0.5rem;
+}
+
+.content {
+  position: relative;
+  grid-area: content;
+  background: #444654;
+}

@@ -1,0 +1,138 @@
+.sidebarSection {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: hidden;
+  margin-right: -0.5rem;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid hsla(0, 0%, 100%, 0.1);
+  }
+
+  .sidebarSectionTitle {
+    font-size: 16px;
+    padding: 0.5rem;
+    display: flex;
+    width: 100%;
+    align-items: center;
+
+    place-content: space-between;
+
+    &:not(:last-child) {
+      border-bottom: 1px solid hsla(0, 0%, 100%, 0.2);
+    }
+  }
+
+  .sidebarSectionContentWrapper {
+    height: 100%;
+    overflow-y: scroll;
+    width: 100%;
+
+    &:hover {
+      &::-webkit-scrollbar-thumb {
+        visibility: visible;
+      }
+    }
+
+    .sidebarSectionContent {
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 0.5rem;
+      margin: 0.5rem 0;
+    }
+  }
+}
+
+.sidebarLink {
+  padding: 0.75rem;
+  align-items: center;
+  display: flex;
+
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+
+  border-radius: 0.375rem;
+  word-break: break-all;
+  flex-wrap: nowrap;
+
+  gap: 0.75rem;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(42, 43, 50);
+
+    .sidebarLinkText {
+      .sidebarLinkBlur {
+        background-image: linear-gradient(
+          to left,
+          #2a2b32,
+          rgba(42, 43, 50, 0)
+        );
+      }
+    }
+  }
+
+  &.active {
+    padding-right: 3.5rem;
+    background: rgba(52, 53, 65);
+
+    .sidebarLinkText {
+      .sidebarLinkBlur {
+        background-image: linear-gradient(
+          to left,
+          #343541,
+          rgba(52, 53, 65, 0)
+        );
+      }
+    }
+  }
+
+  .sidebarLinkExtra {
+    display: flex;
+    z-index: 15;
+    right: 0.75rem;
+    position: absolute;
+  }
+
+  .sidebarLinkText {
+    flex: 1 1 0%;
+
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+
+    text-overflow: ellipsis;
+    overflow: hidden;
+
+    word-break: break-all;
+
+    max-height: 1.25rem;
+
+    position: relative;
+
+    .sidebarLinkBlur {
+      position: absolute;
+      background-image: linear-gradient(to left, #202123, rgba(32, 33, 35, 0));
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 2rem;
+      z-index: 10;
+    }
+
+    &:has(.sidebarLinkInput) {
+      overflow: visible;
+    }
+
+    .sidebarLinkInput {
+      width: 100%;
+      outline: none;
+      border: 1px solid #2463eb;
+      margin: -1px;
+      background: transparent;
+      border-radius: 0px;
+      font-size: 0.875rem;
+      line-height: 1.25rem;
+    }
+  }
+}

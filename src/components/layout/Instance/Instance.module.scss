@@ -1,0 +1,23 @@
+.instanceWrapper {
+  height: 100vh;
+  background: rgba(52, 53, 65);
+
+  display: grid;
+
+  grid-template-columns: 1fr 260px;
+  grid-template-rows: 1fr;
+  grid-template-areas: "content tree";
+
+  &:has(.instanceChatWrapper:only-child) {
+    grid-template-columns: 1fr 0px;
+  }
+
+  .instanceChatWrapper {
+    height: 100vh;
+    position: relative;
+
+    & > :first-child > :first-child {
+      margin-bottom: 12rem;
+    }
+  }
+}
