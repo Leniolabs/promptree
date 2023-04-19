@@ -1,36 +1,33 @@
 import React from "react";
 import styles from "../Chat.module.scss";
-import { INode } from "@/types/chat";
+import { IMessage } from "@/types/chat";
 import { className } from "@/utils/classname";
 import { UserChatMessage } from "./UserChatMessage";
 import { AssistantChatMessage } from "./AssistantChatMessage";
 
 export function ChatMessage(props: {
-  node: INode;
-  onChange?: (message: INode) => void;
-  onBranch?: (message: INode) => void;
+  message: IMessage;
+  onChange?: (message: IMessage) => void;
+  onBranch?: (hash: string) => void;
 }) {
-  if (props.node.type !== "message") return null;
   return (
     <>
       <div
         className={className(
           styles.chatMessage,
-          styles["chat-" + props.node.content.author]
+          styles["chat-" + props.message.author]
         )}
       >
-        {props.node.content.author === "user" && (
+        {props.message.author === "user" && (
           <UserChatMessage
-            message={props.node.content}
-            onChange={(content) =>
-              props.onChange?.({ ...props.node, content } as INode)
-            }
+            message={props.message}
+            onChange={(content) => props.onChange?.(content)}
           />
         )}
-        {props.node.content.author === "assistant" && (
+        {props.message.author === "assistant" && (
           <AssistantChatMessage
-            message={props.node.content}
-            onBranch={() => props.onBranch?.(props.node)}
+            message={props.message}
+            onBranch={() => props.onBranch?.(props.message.id)}
           />
         )}
       </div>

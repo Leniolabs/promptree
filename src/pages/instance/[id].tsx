@@ -1,3 +1,4 @@
+import React from "react";
 import { Layout, Content } from "@/components/layout";
 import { AppHeader } from "@/components/AppHeader";
 import ConnectedSidebar from "@/components/connected/ConnectedSidebar";
@@ -5,16 +6,17 @@ import { TemplateResponse } from "@/types/api";
 import { GetServerSidePropsContext } from "next";
 import { Instance } from "@/components/layout/Instance";
 import { useChat } from "@/query/useChat";
-import React from "react";
 import { SquashModal } from "@/components/modals/SquashModal";
-import { INode } from "@/types/chat";
 import { MergeModal } from "@/components/modals/MergeModal";
+import { NewBranchModal } from "@/components/modals/NewBranchModal";
 
 export default function InstanceView(props: { id: TemplateResponse["id"] }) {
   const chat = useChat(props.id);
 
-  const [squash, setSquash] = React.useState(false);
-  const [merging, setMerging] = React.useState(false);
+  const [mode, setMode] = React.useState<
+    "CREATE_BRANCH" | "MERGE" | "SQUASH_MERGE" | undefined
+  >();
+  const [modeOptions, setModeOptions] = React.useState<any>({});
 
   const handleMessage = React.useCallback(
     (message: string) => {
@@ -23,52 +25,82 @@ export default function InstanceView(props: { id: TemplateResponse["id"] }) {
     [chat]
   );
 
-  const handleSquashCancel = React.useCallback(() => {
-    setSquash(false);
+  const handleRegenerate = React.useCallback(() => {
+    chat.regenerateLastNode();
+  }, [chat]);
+
+  const handleModeCancel = React.useCallback(() => {
+    setMode(undefined);
+    setModeOptions({});
   }, []);
 
-  const handleSquashStart = React.useMemo(() => {
-    if (chat.instance && chat.instance.nodes.length > 2)
-      return () => setSquash(true);
-    return undefined;
-  }, [chat.instance]);
+  const handleBranchStart = React.useCallback((hash: string) => {
+    setMode("CREATE_BRANCH");
+    setModeOptions({ startPoint: hash });
+  }, []);
 
-  const handleSquashSubmit = React.useCallback(
-    (nodes: INode[]) => {
-      setSquash(false);
-      chat.replaceNodes(nodes);
+  const handleCreateBranch = React.useCallback(
+    (branchName: string) => {
+      chat.checkout({ branchName, create: true, ...(modeOptions || {}) });
+      setMode(undefined);
+      setModeOptions({});
     },
     [chat]
   );
 
-  const handleMergeCancel = React.useCallback(() => {
-    setMerging(false);
-  }, []);
-
-  const handleMergeStart = React.useCallback(() => {
-    setMerging(true);
-  }, []);
-
   const handleMerge = React.useCallback(
-    (targetPointer: string) => {
-      if (chat.pointer) {
-        chat.merge(chat.pointer.id, targetPointer);
-        setMerging(false);
+    (targetBranch: string) => {
+      if (chat.instance) {
+        chat.merge({
+          fromBranch: targetBranch,
+          toBranch: chat.instance.ref,
+        });
+        setMode(undefined);
+        setModeOptions({});
       }
     },
     [chat]
   );
 
-  const handleRegenerate = React.useCallback(() => {
-    chat.regenerateLastNode();
-  }, [chat]);
+  const handleSquashStart = React.useMemo(() => {
+    if (chat.instance && chat.instance.branches.length > 1)
+      return () => {
+        setMode("SQUASH_MERGE");
+        setModeOptions({});
+      };
+    return undefined;
+  }, [chat.instance]);
 
-  const handleBranch = React.useCallback(
-    (node: INode) => {
-      chat.checkoutNode(node);
+  const handleSquash = React.useCallback(() => {
+    setMode(undefined);
+    setModeOptions({});
+    // chat.refresh();
+  }, [chat.refresh]);
+
+  const handleMergeStart = React.useMemo(() => {
+    if (chat.instance && chat.instance.branches.length > 1)
+      return () => {
+        setMode("MERGE");
+        setModeOptions({});
+      };
+    return undefined;
+  }, [chat.instance]);
+
+  const handleTrack = React.useCallback(
+    (ref: string) => {
+      if (chat.instance?.branches.find((branch) => branch.branch === ref))
+        chat.checkout({ branchName: ref });
+      else return handleBranchStart(ref);
     },
-    [chat]
+    [chat, handleBranchStart]
   );
+
+  const currentBranch = React.useMemo(() => {
+    if (!chat.instance) return null;
+    return chat.instance.branches.find(
+      (branch) => branch.hash === chat.instance?.ref
+    );
+  }, [chat]);
 
   return (
     <>
@@ -81,37 +113,47 @@ export default function InstanceView(props: { id: TemplateResponse["id"] }) {
               <Instance
                 key={chat.instance.id}
                 title={chat.instance.title}
-                nodes={chat.instance.nodes}
-                pointer={chat.pointer}
-                tree={chat.tree}
-                references={chat.instance.references}
+                messages={chat.instance.messages}
+                commits={chat.instance.commits}
+                branches={chat.instance.branches}
+                pointer={chat.instance.ref}
                 onMessage={handleMessage}
-                onNodeChange={(node) => {
-                  if (node.type === "message")
-                    chat.modifyUserNode(node.id, node.content.content);
+                onMessageChange={(message) => {
+                  chat.editMessage(message.id, message.content);
                 }}
-                onSquash={handleSquashStart}
-                onMerge={handleMergeStart}
                 onRegenerate={handleRegenerate}
-                onBranch={handleBranch}
+                onBranchCreate={handleBranchStart}
+                onTrack={handleTrack}
+                onMerge={handleMergeStart}
+                onSquash={handleSquashStart}
               />
-              {squash && (
-                <SquashModal
-                  instance={chat.instance}
-                  onSave={handleSquashSubmit}
-                  onCancel={handleSquashCancel}
-                />
-              )}
-              {merging && (
-                <MergeModal
-                  instance={chat.instance}
-                  tree={chat.tree}
-                  onSave={handleMerge}
-                  onCancel={handleMergeCancel}
-                />
-              )}
             </>
           ) : null}
+          {mode === "CREATE_BRANCH" && (
+            <NewBranchModal
+              hash={modeOptions?.startPoint}
+              onSave={handleCreateBranch}
+              onCancel={handleModeCancel}
+            />
+          )}
+          {mode === "MERGE" && currentBranch && (
+            <MergeModal
+              currentBranch={currentBranch}
+              branches={chat.instance?.branches || []}
+              onSave={handleMerge}
+              onCancel={handleModeCancel}
+            />
+          )}
+          {mode === "SQUASH_MERGE" && chat.instance && currentBranch && (
+            <SquashModal
+              id={props.id}
+              currentBranch={currentBranch}
+              targetName={currentBranch.branch}
+              branches={chat.instance?.branches || []}
+              onSave={handleSquash}
+              onCancel={handleModeCancel}
+            />
+          )}
         </Content>
       </Layout>
     </>

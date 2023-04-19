@@ -19,7 +19,7 @@
 
   display: flex;
   flex-direction: column;
-  
+
   padding: 0.5rem;
 }
 
@@ -27,4 +27,7 @@
   position: relative;
   grid-area: content;
   background: #444654;
+}
+
+.columns {
 }

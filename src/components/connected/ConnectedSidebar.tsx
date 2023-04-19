@@ -33,7 +33,7 @@ export default function ConnectedSidebar() {
   const handleInstanceDelete = React.useCallback(
     (...args: Parameters<typeof deleteInstanceAsync>) => {
       deleteInstanceAsync(...args);
-      router.push("/instance");
+      router.push("/");
     },
     [deleteInstanceAsync]
   );
@@ -58,7 +58,7 @@ export default function ConnectedSidebar() {
       <SidebarSection
         title={"Instances"}
         onNewItemClick={() => {
-          router.push("/instance");
+          router.push("/");
         }}
       >
         {(instances || []).map((instance) => (
@@ -71,7 +71,7 @@ export default function ConnectedSidebar() {
           />
         ))}
       </SidebarSection>
-      <SidebarSection
+      {/* <SidebarSection
         title={"Templates"}
         onNewItemClick={() => {
           router.push("/template");
@@ -86,7 +86,7 @@ export default function ConnectedSidebar() {
             label={`${template.title} (${template.type})`}
           />
         ))}
-      </SidebarSection>
+      </SidebarSection> */}
     </Sidebar>
   );
 }

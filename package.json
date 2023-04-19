@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@gitgraph/react": "^1.6.0",
     "@prisma/client": "^4.5.0",
     "@types/d3-hierarchy": "^3.1.2",
     "@types/d3-shape": "^3.1.1",
@@ -23,6 +24,8 @@
     "eslint": "8.36.0",
     "eslint-config-next": "13.2.4",
     "highlight.js": "^11.7.0",
+    "isomorphic-git": "^1.23.0",
+    "memfs": "^3.5.0",
     "next": "13.2.4",
     "openai": "^3.2.1",
     "react": "18.2.0",

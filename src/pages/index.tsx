@@ -1,16 +1,49 @@
+import React from "react";
 import { Layout, Content } from "@/components/layout";
 import { AppHeader } from "@/components/AppHeader";
 import ConnectedSidebar from "@/components/connected/ConnectedSidebar";
-import { SquashModal } from "@/components/modals/SquashModal";
+import { Instance } from "@/components/layout/Instance";
+import { GetServerSidePropsContext } from "next";
+import { useCreateChat } from "@/query/useChat";
+import { useRouter } from "next/router";
 
-export default function Home() {
+interface TemplateViewProps {
+  templateId?: string;
+}
+
+export default function TemplateView(props: TemplateViewProps) {
+  const router = useRouter();
+
+  const chat = useCreateChat((instance) =>
+    router.push(`/instance/${instance.id}`)
+  );
+
+  const handleMessage = React.useCallback(
+    (message: string) => {
+      chat.send(message);
+    },
+    [chat]
+  );
+
   return (
     <>
       <AppHeader />
       <Layout>
         <ConnectedSidebar />
-        <Content></Content>
+        <Content>
+          <Instance messages={chat.messages} onMessage={handleMessage} />
+        </Content>
       </Layout>
     </>
   );
+}
+
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const templateId = context.query?.template as string;
+
+  return {
+    props: {
+      templateId: templateId || null,
+    },
+  };
 }

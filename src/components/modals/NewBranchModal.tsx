@@ -1,20 +1,18 @@
 import React from "react";
-import { IBranch, ICommit } from "@/types/chat";
+import { ICommit } from "@/types/chat";
 import { Button } from "../buttons/Button";
 import { Modal, ModalContent, ModalFooter, ModalHeader } from "../layout/Modal";
 import { TextInput } from "../inputs/TextInput";
 import { Label } from "../displays/Label";
 import { Columns } from "../layout/Columns";
-import { SelectInput } from "../inputs/SelectInput";
 
-interface MergeModalProps {
-  currentBranch: IBranch;
+interface NewBranchModalProps {
+  hash: string;
   onSave?: (branchName: string) => void;
   onCancel?: () => void;
-  branches: IBranch[];
 }
 
-export function MergeModal(props: MergeModalProps) {
+export function NewBranchModal(props: NewBranchModalProps) {
   const [branchName, setBranchName] = React.useState("");
 
   const handleSave = React.useCallback(() => {
@@ -24,27 +22,22 @@ export function MergeModal(props: MergeModalProps) {
 
   return (
     <Modal>
-      <ModalHeader title="Merge" onClose={props.onCancel} />
+      <ModalHeader title="Create Branch" onClose={props.onCancel} />
       <ModalContent>
         <Columns count={2}>
-          <Label align="RIGHT">Merge</Label>
-          <Label align="RIGHT">Into</Label>
-          <SelectInput
+          <Label align="RIGHT">Create branch at</Label>
+          <Label align="RIGHT">Branch name</Label>
+          <Label>{props.hash.slice(0, 7)}</Label>
+          <TextInput
             value={branchName}
             onChange={setBranchName}
-            options={props.branches
-              .filter((branch) => branch.hash !== props.currentBranch.hash)
-              .map((branch) => ({
-                label: branch.branch,
-                value: branch.branch,
-              }))}
+            placeholder="Enter a Branch Name"
           />
-          <Label>{props.currentBranch.branch}</Label>
         </Columns>
       </ModalContent>
       <ModalFooter>
         <Button variant="success" onClick={handleSave}>
-          Merge
+          Create Branch
         </Button>
         <Button onClick={props.onCancel}>Cancel</Button>
       </ModalFooter>

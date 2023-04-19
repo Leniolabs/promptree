@@ -1,50 +1,47 @@
 import { getResponse } from "@/ai/openai";
 import { IInstance } from "@/types/api";
-import { INode, IMessage } from "@/types/chat";
 import {
-  addNode,
-  createMessageNode,
-  getBranchNodes,
+  ICheckoutOptions,
+  ICommit,
+  IMergeOptions,
+  IMessage,
+} from "@/types/chat";
+import {
   createInstanceTitle,
+  createMessage,
   squashNodes,
-  updateReferences,
-  updateUserNode,
-  createMergeNode,
 } from "@/utils/instance";
-import { getId } from "@/utils/uuid";
 import { Instance } from "@prisma/client";
 import { ChatCompletionRequestMessage } from "openai";
 import React from "react";
-import { useInstance, useInstances } from "./useInstances";
+import {
+  initSquashInstance,
+  mergeSquashInstance,
+  useInstance,
+  useInstances,
+} from "./useInstances";
+import { useQueryClient } from "react-query";
 
 export function useCreateChat(onCreate?: (instance: IInstance) => void) {
   const { createAsync } = useInstances();
-  const [nodes, setNodes] = React.useState<IInstance["nodes"]>([]);
+  const [messages, setMessages] = React.useState<IInstance["messages"]>([]);
 
   const send = React.useCallback(
     (content: string) => {
-      const userMessage = createMessageNode("user", content);
+      const userMessage = createMessage("user", content);
 
-      setNodes([userMessage]);
+      setMessages([userMessage]);
 
-      const currentMessageList = (
-        userMessage.type === "message"
-          ? [
-              {
-                role: userMessage.content.author,
-                content: userMessage.content.content,
-              },
-            ]
-          : []
-      ) as ChatCompletionRequestMessage[];
+      const currentMessageList = [
+        {
+          role: userMessage.author,
+          content: userMessage.content,
+        },
+      ] as ChatCompletionRequestMessage[];
 
       getResponse(currentMessageList).then(async (response) => {
         if (response) {
-          const assistantMessage = createMessageNode(
-            "assistant",
-            response.content,
-            [userMessage.id]
-          );
+          const assistantMessage = createMessage("assistant", response.content);
 
           const title = await createInstanceTitle([
             userMessage,
@@ -52,14 +49,11 @@ export function useCreateChat(onCreate?: (instance: IInstance) => void) {
           ]);
 
           createAsync({
-            mode: "chat",
-            nodes: [userMessage, assistantMessage],
-            references: [{ name: "master", nodeId: assistantMessage.id }],
+            messages: [userMessage, assistantMessage],
             title,
-            pointer: assistantMessage.id,
           }).then((created) => {
             onCreate?.(created);
-            setNodes([userMessage, assistantMessage]);
+            setMessages([userMessage, assistantMessage]);
           });
         }
       });
@@ -68,146 +62,110 @@ export function useCreateChat(onCreate?: (instance: IInstance) => void) {
   );
 
   return {
-    nodes,
+    messages,
     send,
   };
 }
 
 export function useChat(id: Instance["id"]) {
-  const { data: instance, updateAsync, updateLocal } = useInstance(id);
-
-  const pointer = React.useMemo(() => {
-    if (instance && instance.pointer)
-      return instance?.nodes.find((row) => row.id === instance.pointer);
-    return undefined;
-  }, [instance]);
-
-  const branchNodes = React.useMemo(() => {
-    if (instance && pointer) return getBranchNodes(instance.nodes, pointer.id);
-    return [];
-  }, [instance, pointer]);
-
-  const pointerInstance = React.useMemo(() => {
-    return {
-      ...instance,
-      nodes: branchNodes,
-    };
-  }, [instance, branchNodes]);
+  const {
+    data: instance,
+    updateLocal,
+    addMessagesAsync,
+    checkoutAsync,
+    mergeAsync,
+    refresh,
+  } = useInstance(id);
 
   const send = React.useCallback(
     (content: string) => {
       if (instance) {
-        const userNode = createMessageNode(
-          "user",
-          content,
-          pointer?.id ? [pointer?.id] : undefined
-        );
+        const userMessage = createMessage("user", content);
 
-        let nodes = [...instance.nodes, userNode];
-        let references = updateReferences(
-          userNode,
-          instance.references,
-          pointer?.id || undefined
-        );
+        const currentMessagesList = [
+          ...instance.messages,
+          userMessage,
+        ] as IMessage[];
 
         updateLocal({
-          nodes,
-          references,
-          pointer: userNode.id,
+          messages: currentMessagesList,
         });
 
-        const currentMessageList = getBranchNodes(nodes, userNode.id).map(
-          (node) => {
-            if (node.type === "message")
-              return {
-                role: node.content.author,
-                content: node.content.content,
-              };
-            return false;
-          }
-        ) as ChatCompletionRequestMessage[];
+        const currentMessageList = currentMessagesList.map((message) => {
+          return {
+            role: message.author,
+            content: message.content,
+          };
+        }) as ChatCompletionRequestMessage[];
 
         getResponse(currentMessageList).then((response) => {
           if (response) {
-            const assistantNode = createMessageNode(
+            const assistantMessage = createMessage(
               "assistant",
-              response.content,
-              [userNode.id]
+              response.content
             );
 
-            nodes = [...nodes, assistantNode];
-
-            references = updateReferences(
-              assistantNode,
-              references,
-              userNode.id
-            );
-
-            updateAsync(id, {
-              nodes,
-              references,
-              pointer: assistantNode.id,
+            addMessagesAsync(id, {
+              messages: [userMessage, assistantMessage] as IMessage[],
             });
 
             updateLocal({
-              nodes,
-              references,
-              pointer: assistantNode.id,
+              messages: [
+                ...instance.messages,
+                userMessage,
+                assistantMessage,
+              ] as IMessage[],
             });
           }
         });
       }
     },
-    [instance, pointer]
+    [instance]
   );
 
-  const modifyUserNode = React.useCallback(
-    (nodeId: string, content: string) => {
+  const editMessage = React.useCallback(
+    (messageId: string, content: string) => {
       if (instance) {
-        let { nodes, references } = updateUserNode(
-          instance.nodes,
-          instance.references,
-          nodeId,
-          content
+        const messageIndex = instance.messages.findIndex(
+          (x) => x.id === messageId
         );
+        const userMessage = instance.messages[messageIndex];
+        userMessage.content = content;
+
+        const currentMessagesList = [
+          ...instance.messages.slice(0, messageIndex),
+          userMessage,
+        ] as IMessage[];
 
         updateLocal({
-          nodes,
-          references,
-          pointer: nodeId,
+          messages: currentMessagesList,
         });
 
-        const currentMessageList = getBranchNodes(nodes, nodeId).map((node) => {
-          if (node.type === "message")
-            return {
-              role: node.content.author,
-              content: node.content.content,
-            };
-          return false;
+        const currentMessageList = currentMessagesList.map((message) => {
+          return {
+            role: message.author,
+            content: message.content,
+          };
         }) as ChatCompletionRequestMessage[];
 
         getResponse(currentMessageList).then((response) => {
           if (response) {
-            const assistantNode = createMessageNode(
+            const assistantMessage = createMessage(
               "assistant",
-              response.content,
-              [nodeId]
+              response.content
             );
 
-            nodes = [...nodes, assistantNode];
-
-            references = updateReferences(assistantNode, references, nodeId);
-
-            updateAsync(id, {
-              nodes,
-              references,
-              pointer: assistantNode.id,
+            addMessagesAsync(id, {
+              messages: [userMessage, assistantMessage] as IMessage[],
+              edit: true,
             });
 
             updateLocal({
-              nodes,
-              references,
-              pointer: assistantNode.id,
+              messages: [
+                ...instance.messages,
+                userMessage,
+                assistantMessage,
+              ] as IMessage[],
             });
           }
         });
@@ -217,94 +175,63 @@ export function useChat(id: Instance["id"]) {
   );
 
   const regenerateLastNode = React.useCallback(() => {
-    if (instance && pointer) {
-      //aca hay que regenerar el nodo anterior
-      //pero si el pointer esta en cualquier tenes q eliminar todo lo siguiente
-      let nodes = instance.nodes.slice(0, instance.nodes.length - 1);
+    if (instance) {
+      const userMessages = instance.messages.filter((x) => x.author === "user");
+      const userMessage = userMessages[userMessages.length - 1];
 
-      const lastNode = nodes[nodes.length - 1];
-      let references = updateReferences(
-        lastNode,
-        instance.references,
-        pointer?.id || undefined
-      );
+      const currentMessagesList = [
+        ...instance.messages.slice(0, -2),
+        userMessage,
+      ] as IMessage[];
 
       updateLocal({
-        nodes,
-        pointer: lastNode.id,
-        references,
+        messages: currentMessagesList,
       });
 
-      const currentMessageList = getBranchNodes(nodes, lastNode.id).map(
-        (node) => {
-          if (node.type === "message")
-            return {
-              role: node.content.author,
-              content: node.content.content,
-            };
-          return false;
-        }
-      ) as ChatCompletionRequestMessage[];
+      const currentMessageList = currentMessagesList.map((message) => {
+        return {
+          role: message.author,
+          content: message.content,
+        };
+      }) as ChatCompletionRequestMessage[];
 
       getResponse(currentMessageList).then((response) => {
         if (response) {
-          const assistantNode = createMessageNode(
-            "assistant",
-            response.content,
-            [lastNode.id]
-          );
+          const assistantMessage = createMessage("assistant", response.content);
 
-          nodes = [...nodes, assistantNode];
-
-          references = updateReferences(assistantNode, references, lastNode.id);
-
-          updateAsync(id, {
-            nodes,
-            references,
-            pointer: assistantNode.id,
+          addMessagesAsync(id, {
+            messages: [userMessage, assistantMessage] as IMessage[],
+            regenerate: true,
           });
 
           updateLocal({
-            nodes,
-            references,
-            pointer: assistantNode.id,
+            messages: [
+              ...instance.messages,
+              userMessage,
+              assistantMessage,
+            ] as IMessage[],
           });
         }
       });
     }
-  }, [instance, pointer]);
+  }, [instance]);
 
-  const replaceNodes = React.useCallback(
-    (nodes: INode[]) => {
+  const checkout = React.useCallback(
+    (options: ICheckoutOptions) => {
       if (instance) {
-        updateLocal({ nodes });
-
-        updateAsync(id, {
-          nodes,
+        checkoutAsync(instance.id, {
+          ...options,
         });
-      }
-    },
-    [instance]
-  );
-
-  const checkoutNode = React.useCallback(
-    (node: INode) => {
-      if (instance && instance.id) {
-        updateLocal({ pointer: node.id });
-        updateAsync(id, { pointer: node.id });
       }
     },
     [instance]
   );
 
   const merge = React.useCallback(
-    (fromPointer: string, toPointer: string) => {
+    (options: IMergeOptions) => {
       if (instance) {
-        const node = createMergeNode(instance.nodes, fromPointer, toPointer);
-        console.log('mergeNode', node)
-        updateLocal({
-          nodes: [...instance.nodes, node],
-          pointer: node.id,
+        mergeAsync(instance.id, {
+          ...options,
         });
       }
     },
@@ -312,41 +239,75 @@ export function useChat(id: Instance["id"]) {
   );
 
   return {
-    instance: pointerInstance as IInstance,
-    pointer,
-    tree: instance?.nodes || [],
+    instance,
     send,
     merge,
-    modifyUserNode,
-    replaceNodes,
+    editMessage,
     regenerateLastNode,
-    checkoutNode,
+    checkout,
+    refresh,
   };
 }
 
-export function useSquashChat(instance: IInstance) {
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [nodes, setNodes] = React.useState<IInstance["nodes"]>([]);
+export function useSquashChat(id: Instance["id"], ref: IInstance["ref"]) {
+  const queryClient = useQueryClient();
 
-  const retry = React.useCallback(() => {
-    setIsLoading(true);
-    setNodes([]);
-    squashNodes(instance.nodes || []).then((response) => {
-      setNodes(response);
-      setIsLoading(false);
-    });
-  }, []);
+  const [loadingDifference, setLoadingDifference] =
+    React.useState<boolean>(true);
+  const [difference, setDifference] = React.useState<IMessage[]>([]);
+  const [targetBranch, setTargetBranch] = React.useState<string>();
+
+  const [loadingSquash, setLoadingSquash] = React.useState<boolean>(true);
+  const [squashMessages, setSquashMessages] = React.useState<IMessage[]>([]);
+
+  const retry = React.useCallback(
+    (messages?: IMessage[]) => {
+      setLoadingSquash(true);
+      squashNodes(messages || difference).then((squash) => {
+        setSquashMessages(squash);
+        setLoadingSquash(false);
+      });
+    },
+    [difference]
+  );
 
   React.useEffect(() => {
-    retry();
-  }, [retry]);
+    console.log(id, ref, targetBranch);
+    if (ref && targetBranch) {
+      setLoadingDifference(true);
+      initSquashInstance(id, {
+        fromBranch: targetBranch,
+        toBranch: ref,
+      }).then((resp) => {
+        setLoadingDifference(false);
+        setDifference(resp.difference);
+        retry(resp.difference);
+      });
+    }
+  }, [id, ref, targetBranch]);
+
+  const loading = React.useMemo(() => {
+    return loadingDifference || loadingSquash;
+  }, [loadingDifference, loadingSquash]);
+
+  const merge = React.useCallback(() => {
+    if (!loading && targetBranch && squashMessages) {
+      mergeSquashInstance(id, {
+        fromBranch: targetBranch,
+        toBranch: ref,
+        squashMessages,
+      }).then(() => {
+        queryClient.invalidateQueries(`fetch-instance-${id}`);
+      });
+    }
+  }, [loading, id, ref, targetBranch, squashMessages]);
 
   return {
-    instance: {
-      ...instance,
-      nodes,
-    },
-    isLoading,
+    loading,
+    squashMessages,
+    targetBranch,
+    changeTargetBranch: setTargetBranch,
+    merge,
     retry,
   };
 }

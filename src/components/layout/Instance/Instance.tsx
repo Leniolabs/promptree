@@ -2,40 +2,41 @@ import React from "react";
 import styles from "./Instance.module.scss";
 import { className } from "@/utils/classname";
 import { IInstance, ITemplate } from "@/types/api";
-import { INode, IReference } from "@/types/chat";
-import { InstanceInput, InstanceTemplateInput } from "./Input";
+import { InstanceInput } from "./Input";
 import { Tree } from "./Tree";
 import { ChatContent } from "./ChatContent";
+import { ICommit, IMessage } from "@/types/chat";
 
 export function Instance(
   props: React.PropsWithChildren<{
     title?: IInstance["title"];
-    nodes?: IInstance["nodes"];
-    references?: IReference[];
-    tree?: INode[];
-    pointer?: INode;
+    messages?: IInstance["messages"];
+    commits?: IInstance["commits"];
+    pointer?: IInstance["ref"];
+    branches?: IInstance["branches"];
     template?: ITemplate;
-    onMessage?: (node: string) => void;
-    onNodeChange?: (node: INode) => void;
+    onMessage?: (message: string) => void;
+    onMessageChange?: (message: IMessage) => void;
     onSquash?: () => void;
     onMerge?: (squash?: boolean) => void;
     onRegenerate?: () => void;
-    onBranch?: (message: INode) => void;
+    onTrack?: (ref: string) => void;
+    onBranchCreate?: (ref: string) => void;
   }>
 ) {
   return (
     <div
       className={className(
         styles.instanceWrapper,
-        props.tree && styles.hasTree
+        props.commits && styles.hasTree
       )}
     >
       <div className={styles.instanceChatWrapper}>
         <ChatContent
-          nodes={props.nodes}
           title={props.title}
-          onNodeChange={props.onNodeChange}
-          onBranch={props.onBranch}
+          messages={props.messages}
+          onMessageChange={props.onMessageChange}
+          onBranch={props.onBranchCreate}
         />
         {!props.template && props.onMessage && (
           <InstanceInput
@@ -45,22 +46,15 @@ export function Instance(
             onMerge={props.onMerge}
           />
         )}
-        {props.template && props.onMessage && (
-          <InstanceTemplateInput
-            template={props.template}
-            onSend={props.onMessage}
-          />
-        )}
       </div>
-      {props.tree && props.pointer && (
+      {props.commits && props.pointer && (
         <Tree
-          branchNodes={props.nodes || []}
-          nodes={props.tree}
+          commits={props.commits}
           pointer={props.pointer}
-          references={props.references || []}
-          width={150}
+          branches={props.branches || []}
+          width={300}
           height={1000}
-          onNodeClick={props.onBranch}
+          onCommitDoubleClick={props.onTrack}
         />
       )}
     </div>

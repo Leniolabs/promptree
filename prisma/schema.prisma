@@ -22,16 +22,7 @@ model Instance {
   id      String   @id @default(cuid())
   created DateTime @default(now())
 
-  model String
-  mode  String @default("chat")
-
   title String
 
-  content String @default("[]")
-  pointer String
-  refs    String @default("[]")
-
-  summary  String?
-  output   String?
-  keywords String?
+  content String
 }

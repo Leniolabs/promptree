@@ -1,28 +1,39 @@
+export type IMergeOptions = {
+  fromBranch: string;
+  toBranch: string;
+  squashMessages?: IMessage[];
+};
+
+export type ICheckoutOptions =
+  | {
+      branchName: string;
+      noUpdateHead?: boolean;
+    }
+  | {
+      create: true;
+      branchName: string;
+      startPoint?: string;
+      noUpdateHead?: boolean;
+    };
+
+export type IBranch = {
+  hash: string;
+  branch: string;
+};
+
 export type IMessage = {
+  id: string;
   author: "system" | "user" | "assistant";
   content: string;
 };
 
-export type IReference = {
-  nodeId: string;
-  name: string;
-};
-
-export type INode = {
-  id: string;
-  date: Date;
-  type: "message" | "merge" | "merge-squash";
+export type ICommit = {
+  hash: string;
+  tree: string;
+  timestamp: number;
+  message: string;
   parents: string[];
-} & (
-  | {
-      type: "message";
-      content: IMessage;
-    }
-  | {
-      type: "merge";
-      merged: string[]; //ids of nodes merged
-    }
-);
+};
 
 export type ISquashResponse = {
   user: string;

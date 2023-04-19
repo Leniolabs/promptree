@@ -1,135 +1,132 @@
 import React from "react";
 import styles from "./Tree.module.scss";
+import { IBranch, ICommit } from "@/types/chat";
 import {
-  Dag,
-  dagStratify,
-  sugiyama,
-  layeringTopological,
-  coordSimplex,
-} from "d3-dag";
-import { curveBumpY, link } from "d3-shape";
-import { INode, IReference } from "@/types/chat";
-import { className } from "@/utils/classname";
+  Gitgraph,
+  Orientation,
+  templateExtend,
+  TemplateName,
+} from "./GitGraph";
+import { GitgraphUserApi } from "@gitgraph/core";
+
+import { Commit as CommitCore } from "@gitgraph/core";
+import { ReactSvgElement } from "./GitGraph/types";
 
 interface TreeProps {
-  nodes: INode[];
-  references?: IReference[];
-  branchNodes?: INode[];
-  disabledNodes?: INode[];
+  branches: IBranch[];
+  commits: ICommit[];
+  pointer: string;
+
   width: number;
   height: number;
-  pointer?: INode;
-
-  onNodeClick?: (node: INode) => void;
+  onCommitDoubleClick?: (ref: string) => void;
 }
 
-const createHierarchy = (nodes: INode[]) => {
-  const dag = dagStratify()
-    .id((d: INode) => d.id)
-    //@ts-ignore
-    .parentIds(({ parents }) => parents)(nodes) as Dag<INode>;
+export function Tree(props: TreeProps) {
+  const apiRef = React.useRef<GitgraphUserApi<ReactSvgElement>>();
 
-  const nodeRadius = 12;
-  const padding = 1;
+  const commits = React.useMemo(() => {
+    const getRefs = (commit: ICommit) => {
+      return props.branches
+        .filter((branch) => branch.hash === commit.hash)
+        .map((branch) => branch.branch);
+    };
 
-  const layout = sugiyama()
-    .nodeSize((node) => {
-      const size = node ? nodeRadius * 2 * padding : 10;
-      return [size, size];
-    })
-    .layering(layeringTopological())
-    .coord(coordSimplex());
+    return props.commits
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .map((commit) => ({
+        refs: [
+          // ...(props.pointer === commit.hash ? ["HEAD"] : []),
+          ...getRefs(commit),
+        ],
+        hash: commit.hash,
+        tree: commit.tree,
+        parents: commit.parents,
+        author: {
+          name: "branch-ai",
+          email: "branch-ai@leniolabs.com",
+          timestamp: commit.timestamp,
+        },
+        committer: {
+          name: "branch-ai",
+          email: "branch-ai@leniolabs.com",
+          timestamp: commit.timestamp,
+        },
+        subject: commit.message,
+      }));
+  }, [props.branches, props.commits, props.pointer]);
 
-  const { width, height } = layout(dag);
+  const handleCommitDoubleClick = React.useCallback(
+    (commit: CommitCore<ReactSvgElement>) => {
+      if (commit.refs.length) {
+        props.onCommitDoubleClick?.(commit.refs[0]);
+      } else {
+        props.onCommitDoubleClick?.(commit.hash);
+      }
+    },
+    [props.onCommitDoubleClick]
+  );
 
-  return {
-    width,
-    height,
-    dag,
-  };
-};
-
-export const Tree: React.FC<TreeProps> = (props: TreeProps) => {
-  const { dag, width, height } = createHierarchy(props.nodes);
-
-  const lineGenerator = link(curveBumpY)
-    .x((d) => width - d.x)
-    .y((d) => d.y - 2.5);
+  React.useEffect(() => {
+    apiRef.current?.clear();
+    apiRef.current?.import(commits);
+  }, [commits]);
 
   return (
     <div className={styles.treeWrapper}>
-      <svg width={100} height={height} className={styles.tree}>
-        {dag.descendants().map((node) => {
-          const reference = props.references?.find(
-            (ref) => ref.nodeId === node.data.id
-          );
-          return (
-            <g
-              key={node.data.id}
-              className={className(
-                styles.treeCommit,
-                node.data.id === props.pointer?.id && styles.selected,
-                props.disabledNodes?.some((n) => n.id === node.data.id) &&
-                  styles.disabled
-              )}
-              transform={`translate(0, ${node.y})`}
-              onClick={() => props.onNodeClick?.(node.data)}
-            >
-              <rect x={-10} y={-10} height={20} width={260} />
-              <g transform={`translate(${width - node.x}, ${0})`}>
-                <circle
-                  r={node.data.parents.length > 1 ? 5 : 3}
-                  cx={0}
-                  cy={0}
-                  className={styles.fill}
-                  style={{ cursor: "pointer", pointerEvents: "none" }}
-                />
-                <foreignObject
-                  width={260 - width - node.x}
-                  height={20}
-                  x={5}
-                  y={-10}
-                >
-                  <div className={styles.commitText}>
-                    {reference && (
-                      <div className={styles.commitReference}>
-                        {reference?.name}
-                      </div>
-                    )}
-                    <div className={styles.commitContent}>
-                      {node.data.type === "message" && (
-                        <>{node.data.content.content}</>
-                      )}
-                      {node.data.type === "merge" && <>Merged</>}
-                    </div>
-                  </div>
-                </foreignObject>
-              </g>
-            </g>
-          );
-        })}
-        {dag
-          .links()
-          .sort((a, b) => {
-            if (props.branchNodes?.find((x) => x.id === a.target.data.id)) {
-              return 1;
-            }
-            return -1;
-          })
-          .map((link, i, arr) => (
-            <path
-              key={i}
-              d={lineGenerator(link)}
-              fill="transparent"
-              className={className(
-                styles.stroke,
-                props.disabledNodes?.some(
-                  (n) => n.id === link.source.data.id
-                ) && styles.disabled
-              )}
-            />
-          ))}
-      </svg>
+      <Gitgraph
+        key={commits.length}
+        onCommitDoubleClick={handleCommitDoubleClick}
+        pointer={props.pointer}
+        options={{
+          // mode: Mode.Compact,
+          orientation: Orientation.VerticalReverse,
+          template: templateExtend(TemplateName.Metro, {
+            colors: [
+              "#fe9503",
+              "#1aadf9",
+              "#63da38",
+              "#cb73e1",
+              "#a2845d",
+              "#fecb00",
+            ],
+            branch: {
+              label: {
+                borderRadius: 4,
+                display: true,
+                bgColor: "#ffeced",
+                font: "14px Arial, sans-serif",
+                color: "#230d0b",
+                strokeColor: "#ffa0a0",
+              },
+              lineWidth: 1.5,
+              spacing: 15,
+            },
+            tag: {
+              pointerWidth: 10,
+              font: "14px Arial, sans-serif",
+            },
+            commit: {
+              dot: {
+                size: 3,
+              },
+              spacing: 26,
+              message: {
+                display: true,
+                displayAuthor: false,
+                displayHash: false,
+                font: "14px Arial, sans-serif",
+                color: "#ddddde",
+              },
+            },
+          }),
+        }}
+      >
+        {(gitgraph) => {
+          apiRef.current = gitgraph;
+          gitgraph.import(commits);
+        }}
+      </Gitgraph>
     </div>
   );
-};
+}

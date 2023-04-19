@@ -1,8 +1,10 @@
+import { InstanceRepository } from "@/lib/git";
 import {
   InstanceResponse,
   InstanceListResponse,
   EmptyErrorResponse,
 } from "@/types/api";
+import { IMessage } from "@/types/chat";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { prisma } from "../../../lib";
@@ -14,32 +16,26 @@ export default async function handler(
   res: NextApiResponse<IResponse>
 ) {
   if (req.method === "POST") {
-    const { title, model, mode, pointer, nodes, references } = req.body;
+    const { title, messages } = req.body;
+
+    const repository = new InstanceRepository();
+    await repository.init();
+    await repository.addMessages(messages);
+    const content = repository.toJSON();
 
     const obj = await prisma.instance.create({
       data: {
-        pointer: pointer || "",
-        content: JSON.stringify(nodes || []),
-        refs: JSON.stringify(references || []),
+        content,
         title: title || "",
-        mode: mode || "chat",
-        model: model || "gpt-3.5-turbo",
       },
     });
 
-    const { content: _content, ...temp } = obj;
-
-    return res.status(201).json({
-      ...temp,
-      nodes: JSON.parse(_content || "[]"),
-    });
+    return res.status(201).json(await repository.serializeInstance(obj));
   } else if (req.method === "GET") {
     const list = await prisma.instance.findMany({
       select: {
         id: true,
         title: true,
-        mode: true,
-        model: true,
       },
     });
 
@@ -47,8 +43,6 @@ export default async function handler(
       list.map((row) => ({
         id: row.id,
         title: row.title,
-        mode: row.mode,
-        model: row.model,
       }))
     );
   }

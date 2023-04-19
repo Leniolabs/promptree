@@ -10,7 +10,7 @@ export function InstanceInput(
   props: React.PropsWithChildren<{
     onSend?: (message: string) => void;
     onSquash?: () => void;
-    onMerge?: (squash?: boolean) => void;
+    onMerge?: () => void;
     onRegenerate?: () => void;
   }>
 ) {
@@ -50,19 +50,13 @@ export function InstanceInput(
     <div className={styles.instanceInputWrapper}>
       <div className={styles.instanceInputToolbar}>
         {props.onMerge && (
-          <Button onClick={() => props.onMerge?.(false)}>
+          <Button onClick={() => props.onMerge?.()}>
             <MergeIcon />
             Merge
           </Button>
         )}
         {props.onSquash && (
-          <Button onClick={props.onSquash}>
-            <SquashIcon />
-            Squash
-          </Button>
-        )}
-        {props.onMerge && (
-          <Button onClick={() => props.onMerge?.(true)}>
+          <Button onClick={() => props.onSquash?.()}>
             <SquashIcon />
             Squash & Merge
           </Button>

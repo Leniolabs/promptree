@@ -1,0 +1,9 @@
+.modalChatContent {
+  border: none;
+
+  & > div {
+    & > div > div {
+      padding: 1.5rem 1rem !important;
+    }
+  }
+}

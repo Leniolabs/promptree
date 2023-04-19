@@ -1,4 +1,5 @@
 import { InstanceResponse, InstanceListResponse, IInstance } from "@/types/api";
+import { ICheckoutOptions, IMergeOptions, IMessage } from "@/types/chat";
 import { Instance } from "@prisma/client";
 import axios from "axios";
 import React from "react";
@@ -14,16 +15,64 @@ async function fetchInstance(id: Instance["id"]) {
   return res.data;
 }
 
-async function createInstance(obj: Omit<IInstance, "id">) {
+async function createInstance(obj: Pick<IInstance, "title" | "messages">) {
   const res = await axios.post<InstanceResponse>("/api/instances", obj);
   return res.data;
 }
 
 async function updateInstance(
   id: Instance["id"],
-  obj: Partial<Omit<IInstance, "id">>
+  obj: Partial<Pick<IInstance, "title">>
 ) {
   const res = await axios.patch<InstanceResponse>(`/api/instances/${id}`, obj);
+  return res.data;
+}
+
+async function addMessageInstance(
+  id: Instance["id"],
+  obj: { messages: IMessage[]; regenerate?: boolean; edit?: boolean }
+) {
+  const res = await axios.post<InstanceResponse>(
+    `/api/instances/${id}/add-messages`,
+    obj
+  );
+  return res.data;
+}
+
+async function checkoutInstance(id: Instance["id"], obj: ICheckoutOptions) {
+  const res = await axios.post<InstanceResponse>(
+    `/api/instances/${id}/checkout`,
+    obj
+  );
+  return res.data;
+}
+
+async function mergeInstance(id: Instance["id"], obj: IMergeOptions) {
+  const res = await axios.post<InstanceResponse>(
+    `/api/instances/${id}/merge`,
+    obj
+  );
+  return res.data;
+}
+
+export async function initSquashInstance(
+  id: Instance["id"],
+  obj: IMergeOptions
+) {
+  const res = await axios.get<{ difference: IMessage[] }>(
+    `/api/instances/${id}/squash-merge?fromBranch=${obj.fromBranch}&toBranch=${obj.toBranch}`
+  );
+  return res.data;
+}
+
+export async function mergeSquashInstance(
+  id: Instance["id"],
+  obj: IMergeOptions
+) {
+  const res = await axios.post<InstanceResponse>(
+    `/api/instances/${id}/squash-merge`,
+    obj
+  );
   return res.data;
 }
 
@@ -115,11 +164,64 @@ export function useInstance(id: Instance["id"]) {
     [queryClient]
   );
 
+  const addMessagesAsync = React.useCallback(
+    async (...args: Parameters<typeof addMessageInstance>) => {
+      const updatedInstance = await addMessageInstance(...args);
+      await queryClient.invalidateQueries(`fetch-instance-${args[0]}`);
+      return updatedInstance;
+    },
+    [queryClient]
+  );
+
+  const checkoutAsync = React.useCallback(
+    async (...args: Parameters<typeof checkoutInstance>) => {
+      const updatedInstance = await checkoutInstance(...args);
+      await queryClient.invalidateQueries(`fetch-instance-${args[0]}`);
+      return updatedInstance;
+    },
+    [queryClient]
+  );
+
+  const mergeAsync = React.useCallback(
+    async (...args: Parameters<typeof mergeInstance>) => {
+      const updatedInstance = await mergeInstance(...args);
+      await queryClient.invalidateQueries(`fetch-instance-${args[0]}`);
+      return updatedInstance;
+    },
+    [queryClient]
+  );
+
+  const initSquashAsync = React.useCallback(
+    async (...args: Parameters<typeof initSquashInstance>) => {
+      return await initSquashInstance(...args);
+    },
+    [queryClient]
+  );
+
+  const mergeSquashAsync = React.useCallback(
+    async (...args: Parameters<typeof mergeSquashInstance>) => {
+      const updatedInstance = await mergeSquashInstance(...args);
+      await queryClient.invalidateQueries(`fetch-instance-${args[0]}`);
+      return updatedInstance;
+    },
+    [queryClient]
+  );
+
+  const refresh = React.useCallback(async () => {
+    await queryClient.invalidateQueries(`fetch-instance-${id}`);
+  }, [id]);
+
   return {
     isLoading,
     error,
     data: data || undefined,
+    refresh,
     updateAsync,
     updateLocal,
+    addMessagesAsync,
+    checkoutAsync,
+    mergeAsync,
+    initSquashAsync,
+    mergeSquashAsync,
   };
 }

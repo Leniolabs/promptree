@@ -1,15 +1,16 @@
-import { INode } from "@/types/chat";
+import { IMessage } from "@/types/chat";
 import { ChatMessage } from "./ChatMessage/ChatMessage";
-import stylesWrapper from "../Instance.module.scss";
 import styles from "./Chat.module.scss";
 import React from "react";
+import { className } from "@/utils/classname";
 
 export function ChatContent(
   props: React.PropsWithChildren<{
+    className?: string;
     title?: string;
-    nodes?: INode[];
-    onNodeChange?: (node: INode) => void;
-    onBranch?: (node: INode) => void;
+    messages?: IMessage[];
+    onMessageChange?: (message: IMessage) => void;
+    onBranch?: (hash: string) => void;
   }>
 ) {
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -20,17 +21,20 @@ export function ChatContent(
       if (container.scrollHeight > container.clientHeight) {
         container.scrollTop = container.scrollHeight - container.clientHeight;
       }
-  }, [props.nodes]);
+  }, [props.messages]);
 
   return (
-    <div ref={containerRef} className={styles.chatContent}>
+    <div
+      ref={containerRef}
+      className={className(styles.chatContent, props.className)}
+    >
       <div className={styles.chatMessages}>
         <div className={styles.chatTitle}>{props.title}</div>
-        {props.nodes?.map((node) => (
+        {props.messages?.map((message) => (
           <ChatMessage
-            key={node.id}
-            node={node}
-            onChange={props.onNodeChange}
+            key={message.id}
+            message={message}
+            onChange={props.onMessageChange}
             onBranch={props.onBranch}
           />
         ))}

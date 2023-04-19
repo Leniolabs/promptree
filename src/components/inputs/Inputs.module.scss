@@ -1,0 +1,26 @@
+.inputWrapper {
+  width: 100%;
+  input {
+    width: 100%;
+    background: rgba(64, 65, 79);
+    border: none;
+
+    font-size: 1rem;
+    line-height: 1.5rem;
+
+    padding: 0.25rem;
+  }
+}
+
+.selectWrapper {
+  width: 100%;
+  select {
+    background: rgba(64, 65, 79);
+    border: none;
+
+    font-size: 1rem;
+    line-height: 1.5rem;
+
+    padding: 0.25rem;
+  }
+}
