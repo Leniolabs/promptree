@@ -8,8 +8,12 @@ import { useInstances } from "@/query/useInstances";
 import { useTemplates } from "@/query/useTemplates";
 import { useRouter } from "next/router";
 import React from "react";
+import { SidebarLink } from "../layout/SidebarSection/SidebarLink/SidebarLink";
+import { ThrashIcon, LogoutIcon, SettingsIcon } from "../icons";
+import { useStore } from "@/store";
+import { SettingsModal } from "./modals/SettingsModal";
 
-export default function ConnectedSidebar() {
+export function ConnectedSidebar() {
   const {
     data: instances,
     deleteAsync: deleteInstanceAsync,
@@ -22,6 +26,14 @@ export default function ConnectedSidebar() {
   } = useTemplates();
 
   const router = useRouter();
+
+  const {
+    isSettingsOpen,
+    settings,
+    changeSettings,
+    openSettings,
+    closeSettings,
+  } = useStore();
 
   const handleInstanceSave = React.useCallback(
     (...args: Parameters<typeof updateInstanceAsync>) => {
@@ -71,6 +83,25 @@ export default function ConnectedSidebar() {
           />
         ))}
       </SidebarSection>
+      <SidebarSection fitContent>
+        <SidebarLink icon={<ThrashIcon />} label="Clear conversations" />
+        <SidebarLink
+          icon={<SettingsIcon />}
+          label="Settings"
+          onClick={openSettings}
+        />
+        <SidebarLink icon={<LogoutIcon />} label="Log out" />
+      </SidebarSection>
+      {isSettingsOpen && (
+        <SettingsModal
+          initialSettings={settings}
+          onSave={(settings) => {
+            changeSettings(settings);
+            closeSettings();
+          }}
+          onCancel={closeSettings}
+        />
+      )}
       {/* <SidebarSection
         title={"Templates"}
         onNewItemClick={() => {

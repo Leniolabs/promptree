@@ -41,7 +41,10 @@ IMPORTANT: You are only allowed to reply using only one object in the following 
 It's really important that you use the previous JSON format.
 You cannot write text outside the JSON.`;
 
-export async function squashNodes(messages: IMessage[]): Promise<IMessage[]> {
+export async function squashNodes(
+  apikey: string,
+  messages: IMessage[]
+): Promise<IMessage[]> {
   let response: ISquashResponse = {
     user: "",
     assistant: "",
@@ -50,7 +53,7 @@ export async function squashNodes(messages: IMessage[]): Promise<IMessage[]> {
   try {
     response = JSON.parse(
       (
-        await getResponse([
+        await getResponse(apikey, [
           { role: "system", content: squashSystemTemplate },
           {
             role: "user",
@@ -84,6 +87,7 @@ CONVERSATION:
 IMPORTANT: You can just provide a title of maximum 20 characters without quotes`;
 
 export async function createInstanceTitle(
+  apikey: string,
   messages: IMessage[]
 ): Promise<string> {
   let title = "";
@@ -91,7 +95,7 @@ export async function createInstanceTitle(
   try {
     title = (
       (
-        await getResponse([
+        await getResponse(apikey, [
           { role: "system", content: getChatTitleTemplate },
           {
             role: "user",

@@ -1,10 +1,10 @@
 import React from "react";
 import { ICommit } from "@/types/chat";
-import { Button } from "../buttons/Button";
-import { Modal, ModalContent, ModalFooter, ModalHeader } from "../layout/Modal";
-import { TextInput } from "../inputs/TextInput";
-import { Label } from "../displays/Label";
-import { Columns } from "../layout/Columns";
+import { Button } from "../../buttons/Button";
+import { Modal, ModalContent, ModalFooter, ModalHeader } from "../../layout/Modal";
+import { TextInput } from "../../inputs/TextInput";
+import { Label } from "../../displays/Label";
+import { Columns } from "../../layout/Columns";
 
 interface NewBranchModalProps {
   hash: string;

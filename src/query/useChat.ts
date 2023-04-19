@@ -1,11 +1,6 @@
 import { getResponse } from "@/ai/openai";
 import { IInstance } from "@/types/api";
-import {
-  ICheckoutOptions,
-  ICommit,
-  IMergeOptions,
-  IMessage,
-} from "@/types/chat";
+import { ICheckoutOptions, IMergeOptions, IMessage } from "@/types/chat";
 import {
   createInstanceTitle,
   createMessage,
@@ -21,8 +16,10 @@ import {
   useInstances,
 } from "./useInstances";
 import { useQueryClient } from "react-query";
+import { useAPIKey } from "@/store";
 
 export function useCreateChat(onCreate?: (instance: IInstance) => void) {
+  const apikey = useAPIKey();
   const { createAsync } = useInstances();
   const [messages, setMessages] = React.useState<IInstance["messages"]>([]);
 
@@ -39,11 +36,11 @@ export function useCreateChat(onCreate?: (instance: IInstance) => void) {
         },
       ] as ChatCompletionRequestMessage[];
 
-      getResponse(currentMessageList).then(async (response) => {
+      getResponse(apikey, currentMessageList).then(async (response) => {
         if (response) {
           const assistantMessage = createMessage("assistant", response.content);
 
-          const title = await createInstanceTitle([
+          const title = await createInstanceTitle(apikey, [
             userMessage,
             assistantMessage,
           ]);
@@ -58,7 +55,7 @@ export function useCreateChat(onCreate?: (instance: IInstance) => void) {
         }
       });
     },
-    [onCreate]
+    [apikey, onCreate]
   );
 
   return {
@@ -68,6 +65,7 @@ export function useCreateChat(onCreate?: (instance: IInstance) => void) {
 }
 
 export function useChat(id: Instance["id"]) {
+  const apikey = useAPIKey();
   const {
     data: instance,
     updateLocal,
@@ -98,7 +96,7 @@ export function useChat(id: Instance["id"]) {
           };
         }) as ChatCompletionRequestMessage[];
 
-        getResponse(currentMessageList).then((response) => {
+        getResponse(apikey, currentMessageList).then((response) => {
           if (response) {
             const assistantMessage = createMessage(
               "assistant",
@@ -120,7 +118,7 @@ export function useChat(id: Instance["id"]) {
         });
       }
     },
-    [instance]
+    [apikey, instance]
   );
 
   const editMessage = React.useCallback(
@@ -148,7 +146,7 @@ export function useChat(id: Instance["id"]) {
           };
         }) as ChatCompletionRequestMessage[];
 
-        getResponse(currentMessageList).then((response) => {
+        getResponse(apikey, currentMessageList).then((response) => {
           if (response) {
             const assistantMessage = createMessage(
               "assistant",
@@ -171,7 +169,7 @@ export function useChat(id: Instance["id"]) {
         });
       }
     },
-    [instance]
+    [apikey, instance]
   );
 
   const regenerateLastNode = React.useCallback(() => {
@@ -195,7 +193,7 @@ export function useChat(id: Instance["id"]) {
         };
       }) as ChatCompletionRequestMessage[];
 
-      getResponse(currentMessageList).then((response) => {
+      getResponse(apikey, currentMessageList).then((response) => {
         if (response) {
           const assistantMessage = createMessage("assistant", response.content);
 
@@ -214,7 +212,7 @@ export function useChat(id: Instance["id"]) {
         }
       });
     }
-  }, [instance]);
+  }, [apikey, instance]);
 
   const checkout = React.useCallback(
     (options: ICheckoutOptions) => {
@@ -251,6 +249,7 @@ export function useChat(id: Instance["id"]) {
 
 export function useSquashChat(id: Instance["id"], ref: IInstance["ref"]) {
   const queryClient = useQueryClient();
+  const apikey = useAPIKey();
 
   const [loadingDifference, setLoadingDifference] =
     React.useState<boolean>(true);
@@ -263,12 +262,12 @@ export function useSquashChat(id: Instance["id"], ref: IInstance["ref"]) {
   const retry = React.useCallback(
     (messages?: IMessage[]) => {
       setLoadingSquash(true);
-      squashNodes(messages || difference).then((squash) => {
+      squashNodes(apikey, messages || difference).then((squash) => {
         setSquashMessages(squash);
         setLoadingSquash(false);
       });
     },
-    [difference]
+    [apikey, difference]
   );
 
   React.useEffect(() => {

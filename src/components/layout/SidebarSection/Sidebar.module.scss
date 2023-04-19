@@ -5,6 +5,17 @@
   overflow-y: hidden;
   margin-right: -0.5rem;
 
+  &.sidebarSectionFitContent {
+    max-height: max-content;
+    flex: none;
+
+    .sidebarSectionContentWrapper {
+      .sidebarSectionContent {
+        flex-direction: column;
+      }
+    }
+  }
+
   &:not(:last-child) {
     border-bottom: 1px solid hsla(0, 0%, 100%, 0.1);
   }
@@ -41,6 +52,12 @@
       margin: 0.5rem 0;
     }
   }
+}
+
+button.sidebarLink {
+  border: none;
+  background: transparent;
+  text-align: left;
 }
 
 .sidebarLink {

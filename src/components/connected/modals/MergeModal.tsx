@@ -1,11 +1,11 @@
 import React from "react";
 import { IBranch, ICommit } from "@/types/chat";
-import { Button } from "../buttons/Button";
-import { Modal, ModalContent, ModalFooter, ModalHeader } from "../layout/Modal";
-import { TextInput } from "../inputs/TextInput";
-import { Label } from "../displays/Label";
-import { Columns } from "../layout/Columns";
-import { SelectInput } from "../inputs/SelectInput";
+import { Button } from "../../buttons/Button";
+import { Modal, ModalContent, ModalFooter, ModalHeader } from "../../layout/Modal";
+import { TextInput } from "../../inputs/TextInput";
+import { Label } from "../../displays/Label";
+import { Columns } from "../../layout/Columns";
+import { SelectInput } from "../../inputs/SelectInput";
 
 interface MergeModalProps {
   currentBranch: IBranch;

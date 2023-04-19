@@ -1,11 +1,11 @@
 import { SmallIconButton } from "@/components/buttons/SmallIconButton";
-import { ChatIcon, CheckIcon } from "@/components/icons";
-import { CancelIcon } from "@/components/icons/CancelIcon";
-import { DeleteIcon } from "@/components/icons/DeleteIcon";
-import { TextEditIcon } from "@/components/icons/TextEditIcon";
-import Link from "next/link";
+import {
+  DeleteIcon,
+  CancelIcon,
+  TextEditIcon,
+  CheckIcon,
+} from "@/components/icons";
 import React, { ReactNode } from "react";
-import styles from "../Sidebar.module.scss";
 import { SidebarEditLink } from "./SidebarEditLink";
 import { SidebarLink } from "./SidebarLink";
 

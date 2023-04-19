@@ -1,10 +1,8 @@
 import React from "react";
 import { SendButton } from "@/components/buttons/SendButton";
 import styles from "./Input.module.scss";
-import { SquashIcon } from "@/components/icons/SquashIcon";
+import { SquashIcon, ReloadIcon, MergeIcon } from "@/components/icons";
 import { Button } from "@/components/buttons/Button";
-import { ReloadIcon } from "@/components/icons/ReloadIcon";
-import { MergeIcon } from "@/components/icons/MergeIcon";
 
 export function InstanceInput(
   props: React.PropsWithChildren<{

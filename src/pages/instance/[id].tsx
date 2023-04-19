@@ -1,14 +1,16 @@
 import React from "react";
 import { Layout, Content } from "@/components/layout";
 import { AppHeader } from "@/components/AppHeader";
-import ConnectedSidebar from "@/components/connected/ConnectedSidebar";
+import {
+  ConnectedSidebar,
+  SquashModal,
+  MergeModal,
+  NewBranchModal,
+} from "@/components/connected";
 import { TemplateResponse } from "@/types/api";
 import { GetServerSidePropsContext } from "next";
 import { Instance } from "@/components/layout/Instance";
 import { useChat } from "@/query/useChat";
-import { SquashModal } from "@/components/modals/SquashModal";
-import { MergeModal } from "@/components/modals/MergeModal";
-import { NewBranchModal } from "@/components/modals/NewBranchModal";
 
 export default function InstanceView(props: { id: TemplateResponse["id"] }) {
   const chat = useChat(props.id);

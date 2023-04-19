@@ -1,14 +1,14 @@
 import { IInstance } from "@/types/api";
-import { Button } from "../buttons/Button";
-import { ChatContent } from "../layout/Instance/ChatContent";
-import { Modal, ModalContent, ModalFooter, ModalHeader } from "../layout/Modal";
-import { Loader } from "../Loader";
+import { Button } from "../../buttons/Button";
+import { ChatContent } from "../../layout/Instance/ChatContent";
+import { Modal, ModalContent, ModalFooter, ModalHeader } from "../../layout/Modal";
+import { Loader } from "../../Loader";
 import { IBranch, IMessage } from "@/types/chat";
 import { useSquashChat } from "@/query/useChat";
 import React from "react";
-import { Columns } from "../layout/Columns";
-import { Label } from "../displays/Label";
-import { SelectInput } from "../inputs/SelectInput";
+import { Columns } from "../../layout/Columns";
+import { Label } from "../../displays/Label";
+import { SelectInput } from "../../inputs/SelectInput";
 import styles from "./Modals.module.scss";
 
 interface SquashModalProps {

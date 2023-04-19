@@ -1,6 +1,5 @@
 import { IconLinkButton } from "@/components/buttons";
-import { ChatIcon } from "@/components/icons";
-import { TemplateIcon } from "@/components/icons/TemplateIcon";
+import { ChatIcon, TemplateIcon } from "@/components/icons";
 import { SidebarEditableLink } from "./SidebarLink/SidebarEditableLink";
 
 export function SidebarLinkTemplate(props: {

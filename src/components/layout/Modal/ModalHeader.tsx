@@ -1,5 +1,5 @@
 import { SmallIconButton } from "@/components/buttons/SmallIconButton";
-import { CancelIcon } from "@/components/icons/CancelIcon";
+import { CancelIcon } from "@/components/icons";
 import styles from "./Model.module.scss";
 
 export function ModalHeader(

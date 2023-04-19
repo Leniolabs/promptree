@@ -1,7 +1,7 @@
 import React from "react";
 import { Layout, Content } from "@/components/layout";
 import { AppHeader } from "@/components/AppHeader";
-import ConnectedSidebar from "@/components/connected/ConnectedSidebar";
+import { ConnectedSidebar } from "@/components/connected";
 import { Instance } from "@/components/layout/Instance";
 import { GetServerSidePropsContext } from "next";
 import { useCreateChat } from "@/query/useChat";
