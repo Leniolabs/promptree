@@ -106,7 +106,6 @@ export default function InstanceView(props: { id: TemplateResponse["id"] }) {
 
   return (
     <>
-      <AppHeader />
       <Layout>
         <ConnectedSidebar />
         <Content>

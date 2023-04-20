@@ -23,7 +23,6 @@ export default function TemplateView() {
 
   return (
     <>
-      <AppHeader />
       <Layout>
         <ConnectedSidebar />
         <Content>

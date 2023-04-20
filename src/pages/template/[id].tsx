@@ -11,7 +11,6 @@ export default function TemplateView(props: { id?: TemplateResponse["id"] }) {
 
   return (
     <>
-      <AppHeader />
       <Layout>
         <ConnectedSidebar />
         <Content>
