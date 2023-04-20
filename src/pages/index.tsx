@@ -3,15 +3,10 @@ import { Layout, Content } from "@/components/layout";
 import { AppHeader } from "@/components/AppHeader";
 import { ConnectedSidebar } from "@/components/connected";
 import { Instance } from "@/components/layout/Instance";
-import { GetServerSidePropsContext } from "next";
 import { useCreateChat } from "@/query/useChat";
 import { useRouter } from "next/router";
 
-interface TemplateViewProps {
-  templateId?: string;
-}
-
-export default function TemplateView(props: TemplateViewProps) {
+export default function InstanceView() {
   const router = useRouter();
 
   const chat = useCreateChat((instance) =>
@@ -36,14 +31,4 @@ export default function TemplateView(props: TemplateViewProps) {
       </Layout>
     </>
   );
-}
-
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const templateId = context.query?.template as string;
-
-  return {
-    props: {
-      templateId: templateId || null,
-    },
-  };
 }

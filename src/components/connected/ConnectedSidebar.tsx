@@ -2,10 +2,8 @@ import {
   Sidebar,
   SidebarSection,
   SidebarLinkInstance,
-  SidebarLinkTemplate,
 } from "@/components/layout";
 import { useInstances } from "@/query/useInstances";
-import { useTemplates } from "@/query/useTemplates";
 import { useRouter } from "next/router";
 import React from "react";
 import { SidebarLink } from "../layout/SidebarSection/SidebarLink/SidebarLink";
@@ -19,11 +17,6 @@ export function ConnectedSidebar() {
     deleteAsync: deleteInstanceAsync,
     updateAsync: updateInstanceAsync,
   } = useInstances();
-  const {
-    data: templates,
-    deleteAsync: deleteTemplateAsync,
-    updateAsync: updateTemplateAsync,
-  } = useTemplates();
 
   const router = useRouter();
 
@@ -48,21 +41,6 @@ export function ConnectedSidebar() {
       router.push("/");
     },
     [deleteInstanceAsync]
-  );
-
-  const handleTemplateSave = React.useCallback(
-    (...args: Parameters<typeof updateTemplateAsync>) => {
-      updateTemplateAsync(...args);
-    },
-    [updateTemplateAsync]
-  );
-
-  const handleTemplateDelete = React.useCallback(
-    (...args: Parameters<typeof deleteTemplateAsync>) => {
-      deleteTemplateAsync(...args);
-      router.push("/template");
-    },
-    [deleteTemplateAsync]
   );
 
   return (
@@ -102,22 +80,6 @@ export function ConnectedSidebar() {
           onCancel={closeSettings}
         />
       )}
-      {/* <SidebarSection
-        title={"Templates"}
-        onNewItemClick={() => {
-          router.push("/template");
-        }}
-      >
-        {(templates || []).map((template) => (
-          <SidebarLinkTemplate
-            key={template.id}
-            id={template.id}
-            onDelete={handleTemplateDelete}
-            onSave={(title) => handleTemplateSave(template.id, { title })}
-            label={`${template.title} (${template.type})`}
-          />
-        ))}
-      </SidebarSection> */}
     </Sidebar>
   );
 }

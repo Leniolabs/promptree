@@ -10,14 +10,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Template {
-  id String @id @default(cuid())
-
-  title   String
-  type    String
-  content String
-}
-
 model Instance {
   id      String   @id @default(cuid())
   created DateTime @default(now())

@@ -49,24 +49,6 @@
       max-width: 48rem;
     }
 
-    .instanceTemplate {
-      max-height: 60vh;
-      overflow-y: auto;
-      textarea {
-        width: calc(100% - 1rem);
-        border: none;
-        outline: none;
-        resize: none;
-        padding: 0;
-        margin: 0;
-        min-height: 60px;
-
-        &::-webkit-scrollbar-thumb {
-          visibility: visible;
-        }
-      }
-    }
-
     .instanceTextArea {
       background-color: transparent;
 

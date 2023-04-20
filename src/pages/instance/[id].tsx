@@ -7,12 +7,12 @@ import {
   MergeModal,
   NewBranchModal,
 } from "@/components/connected";
-import { TemplateResponse } from "@/types/api";
 import { GetServerSidePropsContext } from "next";
 import { Instance } from "@/components/layout/Instance";
 import { useChat } from "@/query/useChat";
+import { InstanceResponse } from "@/types/api";
 
-export default function InstanceView(props: { id: TemplateResponse["id"] }) {
+export default function InstanceView(props: { id: InstanceResponse["id"] }) {
   const chat = useChat(props.id);
 
   const [mode, setMode] = React.useState<
@@ -76,7 +76,6 @@ export default function InstanceView(props: { id: TemplateResponse["id"] }) {
   const handleSquash = React.useCallback(() => {
     setMode(undefined);
     setModeOptions({});
-    // chat.refresh();
   }, [chat.refresh]);
 
   const handleMergeStart = React.useMemo(() => {
@@ -106,6 +105,7 @@ export default function InstanceView(props: { id: TemplateResponse["id"] }) {
 
   return (
     <>
+      <AppHeader />
       <Layout>
         <ConnectedSidebar />
         <Content>

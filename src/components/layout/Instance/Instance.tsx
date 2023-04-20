@@ -1,11 +1,11 @@
 import React from "react";
 import styles from "./Instance.module.scss";
 import { className } from "@/utils/classname";
-import { IInstance, ITemplate } from "@/types/api";
+import { IInstance } from "@/types/api";
 import { InstanceInput } from "./Input";
 import { Tree } from "./Tree";
 import { ChatContent } from "./ChatContent";
-import { ICommit, IMessage } from "@/types/chat";
+import { IMessage } from "@/types/chat";
 
 export function Instance(
   props: React.PropsWithChildren<{
@@ -14,7 +14,6 @@ export function Instance(
     commits?: IInstance["commits"];
     pointer?: IInstance["ref"];
     branches?: IInstance["branches"];
-    template?: ITemplate;
     onMessage?: (message: string) => void;
     onMessageChange?: (message: IMessage) => void;
     onSquash?: () => void;
@@ -38,7 +37,7 @@ export function Instance(
           onMessageChange={props.onMessageChange}
           onBranch={props.onBranchCreate}
         />
-        {!props.template && props.onMessage && (
+        {props.onMessage && (
           <InstanceInput
             onSend={props.onMessage}
             onRegenerate={props.onRegenerate}

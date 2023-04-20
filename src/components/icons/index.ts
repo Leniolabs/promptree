@@ -12,7 +12,6 @@ export * from "./ReloadIcon";
 export * from "./SendIcon";
 export * from "./SettingsIcon";
 export * from "./SquashIcon";
-export * from "./TemplateIcon";
 export * from "./TextEditIcon";
 export * from "./ThrashIcon";
 export * from "./UserIcon";
