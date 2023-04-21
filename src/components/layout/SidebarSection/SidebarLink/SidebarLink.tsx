@@ -9,6 +9,7 @@ type SidebarLinkProps = {
   extra?: ReactNode;
   extraForced?: ReactNode;
   label: string;
+  border?: boolean;
 } & (
   | {
       href: string;
@@ -19,13 +20,19 @@ type SidebarLinkProps = {
 );
 
 export function SidebarLink(props: SidebarLinkProps) {
+  const location = useRouter();
+
   const active = "href" in props && location.pathname === props.href;
 
   if ("href" in props)
     return (
       <Link
         href={props.href}
-        className={className(styles.sidebarLink, active ? styles.active : "")}
+        className={className(
+          styles.sidebarLink,
+          props.border && styles.border,
+          active ? styles.active : ""
+        )}
       >
         {props.icon}
         <div className={styles.sidebarLinkText}>
@@ -44,7 +51,11 @@ export function SidebarLink(props: SidebarLinkProps) {
   return (
     <button
       onClick={props.onClick}
-      className={className(styles.sidebarLink, active ? styles.active : "")}
+      className={className(
+        styles.sidebarLink,
+        props.border && styles.border,
+        active ? styles.active : ""
+      )}
     >
       {props.icon}
       <div className={styles.sidebarLinkText}>

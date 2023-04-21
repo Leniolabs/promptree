@@ -5,19 +5,19 @@ export function useLocalStorageState<T>(name: string, initialValue: T) {
     return initialValue;
   });
 
+  const setState = React.useCallback((state: T) => {
+    localStorage.setItem(name, JSON.stringify({ value: state }));
+    _setState(state);
+  }, []);
+
   React.useEffect(() => {
     const savedValue = localStorage.getItem(name);
     if (savedValue) {
       _setState(JSON.parse(savedValue).value);
     } else {
-      _setState(initialValue);
+      setState(initialValue);
     }
-  }, []);
-
-  const setState = React.useCallback((state: T) => {
-    localStorage.setItem(name, JSON.stringify({ value: state }));
-    _setState(state);
-  }, []);
+  }, [setState]);
 
   return [state, setState] as [T, (state: T) => void];
 }

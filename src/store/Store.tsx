@@ -1,6 +1,7 @@
 import React from "react";
 import { ISettings, IStore } from "./types";
 import { useLocalStorageState } from "@/hooks";
+import { getId } from "@/utils/uuid";
 
 const Store = React.createContext<IStore>({
   isSettingsOpen: false,

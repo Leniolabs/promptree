@@ -4,6 +4,8 @@ import { IMessage } from "@/types/chat";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { prisma } from "../../../../lib";
+import { getSession } from "next-auth/react";
+import { getUserByEmail } from "@/utils/queries";
 
 type IResponse = InstanceResponse | EmptyErrorResponse;
 
@@ -24,6 +26,13 @@ export default async function handler(
       },
     });
     if (!obj) return res.status(404).send({});
+
+    const session = await getSession({ req });
+    const user = session?.user?.email
+      ? await getUserByEmail(session.user.email)
+      : null;
+
+    if (!obj.public && obj.userId !== user?.id) return res.status(401).send({});
 
     const repository = InstanceRepository.fromJSON(obj.content);
     await repository.checkout({

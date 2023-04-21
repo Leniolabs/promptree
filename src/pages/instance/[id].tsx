@@ -11,9 +11,14 @@ import { GetServerSidePropsContext } from "next";
 import { Instance } from "@/components/layout/Instance";
 import { useChat } from "@/query/useChat";
 import { InstanceResponse } from "@/types/api";
+import { useAPIKey } from "@/store";
+import { getSession } from "next-auth/react";
+import { getInstanceById, getUserByEmail } from "@/utils/queries";
 
 export default function InstanceView(props: { id: InstanceResponse["id"] }) {
   const chat = useChat(props.id);
+
+  const apikey = useAPIKey();
 
   const [mode, setMode] = React.useState<
     "CREATE_BRANCH" | "MERGE" | "SQUASH_MERGE" | undefined
@@ -118,7 +123,7 @@ export default function InstanceView(props: { id: InstanceResponse["id"] }) {
                 commits={chat.instance.commits}
                 branches={chat.instance.branches}
                 pointer={chat.instance.ref}
-                onMessage={handleMessage}
+                onMessage={apikey ? handleMessage : undefined}
                 onMessageChange={(message) => {
                   chat.editMessage(message.id, message.content);
                 }}
@@ -163,6 +168,21 @@ export default function InstanceView(props: { id: InstanceResponse["id"] }) {
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const id = context.params?.id as string;
+
+  const session = await getSession(context);
+  const user = session?.user?.email
+    ? await getUserByEmail(session.user.email)
+    : null;
+
+  const instance = await getInstanceById(id);
+
+  if (!instance || (!instance.public && instance.userId !== user?.id))
+    return {
+      redirect: {
+        destination: `/`,
+        permanent: false,
+      },
+    };
 
   return {
     props: {

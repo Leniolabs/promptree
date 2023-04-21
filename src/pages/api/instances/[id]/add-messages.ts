@@ -4,6 +4,8 @@ import { IMessage } from "@/types/chat";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { prisma } from "../../../../lib";
+import { getSession } from "next-auth/react";
+import { getUserByEmail } from "@/utils/queries";
 
 type IResponse = InstanceResponse | EmptyErrorResponse;
 
@@ -17,6 +19,11 @@ export default async function handler(
   const { messages, regenerate, edit } = req.body;
   if (!messages) return res.status(400).send({});
 
+  const session = await getSession({ req });
+  const user = session?.user?.email
+    ? await getUserByEmail(session.user.email)
+    : null;
+
   const obj = await prisma.instance.findFirst({
     where: {
       id,
@@ -26,7 +33,7 @@ export default async function handler(
 
   const repository = InstanceRepository.fromJSON(obj.content);
   if (req.method === "POST") {
-    await repository.addMessages(messages, { regenerate, edit });
+    await repository.addMessages(messages, { regenerate, edit }, user);
 
     const updatedObj = await prisma.instance.update({
       where: {

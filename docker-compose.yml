@@ -1,0 +1,14 @@
+version: "3"
+services:
+  prompthub-db:
+    image: amd64/postgres:15.1
+    container_name: prompthub-db
+    restart: always
+    environment:
+      POSTGRES_DB: "prompthub"
+      POSTGRES_USER: "leniolabs"
+      POSTGRES_PASSWORD: "leniolabs"
+    ports:
+      - "5432:5432"
+    expose:
+      - "5432"

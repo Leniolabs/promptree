@@ -2,7 +2,7 @@ import { IInstance } from "@/types/api";
 import { Button } from "../../buttons/Button";
 import { ChatContent } from "../../layout/Instance/ChatContent";
 import { Modal, ModalContent, ModalFooter, ModalHeader } from "../../layout/Modal";
-import { Loader } from "../../Loader";
+import { Loader } from "../../misc/Loader";
 import { IBranch, IMessage } from "@/types/chat";
 import { useSquashChat } from "@/query/useChat";
 import React from "react";

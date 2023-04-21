@@ -19,5 +19,16 @@
     & > :first-child > :first-child {
       margin-bottom: 12rem;
     }
+
+    &:has(> :only-child) {
+      // display: none;
+      // Add your styles here
+
+      & > :first-child > :first-child {
+        margin-bottom: 2rem;
+      }
+
+      
+    }
   }
 }

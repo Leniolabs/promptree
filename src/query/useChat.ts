@@ -12,15 +12,15 @@ import React from "react";
 import {
   initSquashInstance,
   mergeSquashInstance,
+  useCreateInstance,
   useInstance,
-  useInstances,
 } from "./useInstances";
 import { useQueryClient } from "react-query";
 import { useAPIKey } from "@/store";
 
 export function useCreateChat(onCreate?: (instance: IInstance) => void) {
   const apikey = useAPIKey();
-  const { createAsync } = useInstances();
+  const { createAsync } = useCreateInstance();
   const [messages, setMessages] = React.useState<IInstance["messages"]>([]);
 
   const send = React.useCallback(

@@ -8,6 +8,10 @@
   grid-template-rows: 1fr;
   gap: 0px 0px;
   grid-template-areas: "sidebar content";
+
+  &:not(:has(.sidebar)) {
+    grid-template-areas: "content content";
+  }
 }
 
 .sidebar {
@@ -21,6 +25,7 @@
   flex-direction: column;
 
   padding: 0.5rem;
+  padding-top: 0rem;
 }
 
 .content {

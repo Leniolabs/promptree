@@ -1,22 +1,22 @@
-import {
-  Sidebar,
-  SidebarSection,
-  SidebarLinkInstance,
-} from "@/components/layout";
-import { useInstances } from "@/query/useInstances";
+import { Sidebar, SidebarSection } from "@/components/layout";
 import { useRouter } from "next/router";
 import React from "react";
 import { SidebarLink } from "../layout/SidebarSection/SidebarLink/SidebarLink";
-import { ThrashIcon, LogoutIcon, SettingsIcon } from "../icons";
+import {
+  ThrashIcon,
+  LogoutIcon,
+  SettingsIcon,
+  PlusIcon,
+  LoginIcon,
+} from "../icons";
 import { useStore } from "@/store";
 import { SettingsModal } from "./modals/SettingsModal";
+import { useSession, signOut } from "next-auth/react";
+import { HistoryLoginRequiredMsg } from "../misc/HistoryLoginRequiredMsg";
+import { ConnectedInstancesList } from "./ConnectedInstancesList";
 
 export function ConnectedSidebar() {
-  const {
-    data: instances,
-    deleteAsync: deleteInstanceAsync,
-    updateAsync: updateInstanceAsync,
-  } = useInstances();
+  const session = useSession();
 
   const router = useRouter();
 
@@ -28,47 +28,45 @@ export function ConnectedSidebar() {
     closeSettings,
   } = useStore();
 
-  const handleInstanceSave = React.useCallback(
-    (...args: Parameters<typeof updateInstanceAsync>) => {
-      updateInstanceAsync(...args);
-    },
-    [updateInstanceAsync]
-  );
+  const isUnauthenticated = React.useMemo(() => {
+    return session.status === "unauthenticated";
+  }, [session]);
 
-  const handleInstanceDelete = React.useCallback(
-    (...args: Parameters<typeof deleteInstanceAsync>) => {
-      deleteInstanceAsync(...args);
-      router.push("/");
-    },
-    [deleteInstanceAsync]
-  );
+  const isAuthenticated = React.useMemo(() => {
+    return session.status === "authenticated";
+  }, [session]);
 
   return (
     <Sidebar>
-      <SidebarSection
-        title={"Instances"}
-        onNewItemClick={() => {
-          router.push("/");
-        }}
-      >
-        {(instances || []).map((instance) => (
-          <SidebarLinkInstance
-            key={instance.id}
-            id={instance.id}
-            onDelete={handleInstanceDelete}
-            onSave={(title) => handleInstanceSave(instance.id, { title })}
-            label={instance.title}
-          />
-        ))}
-      </SidebarSection>
       <SidebarSection fitContent>
-        <SidebarLink icon={<ThrashIcon />} label="Clear conversations" />
+        <SidebarLink
+          icon={<PlusIcon />}
+          label="New chat"
+          onClick={() => router.push("/")}
+          border
+        />
+      </SidebarSection>
+      {isUnauthenticated && <HistoryLoginRequiredMsg />}
+      {isAuthenticated && <ConnectedInstancesList />}
+      <SidebarSection fitContent>
+        {isAuthenticated && (
+          <SidebarLink icon={<ThrashIcon />} label="Clear conversations" />
+        )}
         <SidebarLink
           icon={<SettingsIcon />}
           label="Settings"
           onClick={openSettings}
         />
-        <SidebarLink icon={<LogoutIcon />} label="Log out" />
+        {isUnauthenticated && (
+          <SidebarLink href="/login" icon={<LoginIcon />} label="Login" />
+        )}
+        {isAuthenticated && (
+          <SidebarLink
+            onClick={() => signOut()}
+            icon={<LogoutIcon />}
+            label="Log out"
+          />
+        )}
       </SidebarSection>
       {isSettingsOpen && (
         <SettingsModal

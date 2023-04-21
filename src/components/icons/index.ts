@@ -4,6 +4,7 @@ export * from "./ChatIcon";
 export * from "./CheckIcon";
 export * from "./DeleteIcon";
 export * from "./EditIcon";
+export * from "./LoginIcon";
 export * from "./LogoutIcon";
 export * from "./MergeIcon";
 export * from "./OpenAIIcon";

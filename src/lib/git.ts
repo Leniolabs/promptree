@@ -3,23 +3,11 @@ import { dirname } from "path";
 import git, { Errors } from "isomorphic-git";
 import { ICheckoutOptions, IMergeOptions, IMessage } from "@/types/chat";
 import { IInstance } from "@/types/api";
-import { Instance } from "@prisma/client";
+import { Instance, User } from "@prisma/client";
+import { APP_EMAIL } from "@/settings";
 
 const CHAT_FILE_PATH = "/chat.json";
 const ROOT_DIR = "/repository";
-
-function getCircularReplacer() {
-  const seen = new WeakSet();
-  return (key: string, value: any) => {
-    if (typeof value === "object" && value !== null) {
-      if (seen.has(value)) {
-        return undefined;
-      }
-      seen.add(value);
-    }
-    return value;
-  };
-}
 
 export class InstanceRepository {
   //@ts-ignore
@@ -38,7 +26,7 @@ export class InstanceRepository {
     this.fs = createFsFromVolume(this.volume);
   }
 
-  async init() {
+  async init(user?: User | null) {
     this.fs.mkdirSync(ROOT_DIR);
     this.fs.writeFileSync(ROOT_DIR + CHAT_FILE_PATH, "[]");
 
@@ -53,8 +41,8 @@ export class InstanceRepository {
       dir: ROOT_DIR,
       message: "initial commit",
       author: {
-        name: "branchat-ai",
-        email: "branchat-ai@leniolabs.com",
+        name: user?.name || "Annonymous",
+        email: user?.email || APP_EMAIL,
       },
     });
   }
@@ -188,7 +176,7 @@ export class InstanceRepository {
     });
   }
 
-  async merge(options: IMergeOptions) {
+  async merge(options: IMergeOptions, user?: User | null) {
     if (options.squashMessages) {
       this.addMessages(options.squashMessages);
     } else {
@@ -196,17 +184,7 @@ export class InstanceRepository {
         options.fromBranch,
         options.toBranch
       );
-      this.addMessages(difference);
-      // const fromOid = await this.getBranchOid(options.fromBranch);
-      // const fromMessages = await this.getMessages(fromOid);
-
-      // const toOid = await this.getBranchOid(options.toBranch);
-      // const toMessages = await this.getMessages(toOid);
-
-      // const mergedMessages = [...toMessages, ...fromMessages].filter(
-      //   (x, i, arr) => arr.findIndex((y) => y.id === x.id) === i
-      // );
-      // this.updateChat(mergedMessages);
+      this.addMessages(difference, undefined, user);
     }
 
     await git.add({
@@ -221,8 +199,8 @@ export class InstanceRepository {
       message: `Merge branch '${options.fromBranch}' into '${options.toBranch}'`,
       parent: [options.toBranch, options.fromBranch],
       author: {
-        name: "branchat-ai",
-        email: "branchat-ai@leniolabs.com",
+        name: user?.name || "Annonymous",
+        email: user?.email || APP_EMAIL,
       },
     });
   }
@@ -242,7 +220,8 @@ export class InstanceRepository {
 
   async addMessages(
     messages: IMessage[],
-    options?: { regenerate?: boolean; edit?: boolean }
+    options?: { regenerate?: boolean; edit?: boolean },
+    user?: User | null
   ) {
     const currentChat = await this.getMessages();
     if (options?.regenerate || options?.edit) {
@@ -273,8 +252,8 @@ export class InstanceRepository {
       message:
         commitMessage.slice(0, 48) + (commitMessage.length > 48 ? "..." : ""),
       author: {
-        name: "branchat-ai",
-        email: "branchat-ai@leniolabs.com",
+        name: user?.name || "Annonymous",
+        email: user?.email || APP_EMAIL,
       },
     });
 
