@@ -1,6 +1,5 @@
 import { className } from "@/utils/classname";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { ReactNode } from "react";
 import styles from "../Sidebar.module.scss";
 
@@ -20,8 +19,6 @@ type SidebarLinkProps = {
 );
 
 export function SidebarLink(props: SidebarLinkProps) {
-  const location = useRouter();
-
   const active = "href" in props && location.pathname === props.href;
 
   if ("href" in props)
