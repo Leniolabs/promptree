@@ -16,13 +16,19 @@ async function fetchInstances() {
   return res.data;
 }
 
+async function deleteInstances() {
+  const res = await axios.delete<InstanceResponse>(`/api/instances`, {
+    withCredentials: true,
+  });
+  return res.data;
+}
+
 async function fetchInstance(id: Instance["id"]) {
   const res = await axios.get<InstanceResponse>(`/api/instances/${id}`, {
     withCredentials: true,
   });
   return res.data;
 }
-
 async function createInstance(obj: Pick<IInstance, "title" | "messages">) {
   const res = await axios.post<InstanceResponse>("/api/instances", obj, {
     withCredentials: true,
@@ -127,6 +133,24 @@ export function useCreateInstance() {
   };
 }
 
+export function useDeleteInstances() {
+  const queryClient = useQueryClient();
+
+  const deleteAllAsync = React.useCallback(
+    async (...args: Parameters<typeof deleteInstances>) => {
+      const newInstance = await deleteInstances(...args);
+      await queryClient.invalidateQueries("fetch-instances");
+      location.href = '/'
+      return newInstance;
+    },
+    [queryClient]
+  );
+
+  return {
+    deleteAllAsync,
+  };
+}
+
 export function useInstances() {
   const queryClient = useQueryClient();
 
@@ -162,6 +186,15 @@ export function useInstances() {
     [queryClient]
   );
 
+  const deleteAllAsync = React.useCallback(
+    async (...args: Parameters<typeof deleteInstances>) => {
+      const deletedInstances = await deleteInstances(...args);
+      await queryClient.invalidateQueries("fetch-instances");
+      return deletedInstances;
+    },
+    [queryClient]
+  );
+
   return {
     isLoading,
     error,
@@ -169,6 +202,7 @@ export function useInstances() {
     createAsync,
     updateAsync,
     deleteAsync,
+    deleteAllAsync,
   };
 }
 

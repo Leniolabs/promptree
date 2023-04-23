@@ -58,6 +58,16 @@ export default async function handler(
         title: row.title,
       }))
     );
+  } else if (req.method === "DELETE") {
+    if (!user) return res.status(401).send({});
+
+    await prisma.instance.deleteMany({
+      where: {
+        userId: user.id,
+      },
+    });
+
+    return res.status(200).json({});
   }
 
   return res.status(400).json({});

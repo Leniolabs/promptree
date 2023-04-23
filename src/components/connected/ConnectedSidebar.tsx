@@ -14,11 +14,14 @@ import { SettingsModal } from "./modals/SettingsModal";
 import { useSession, signOut } from "next-auth/react";
 import { HistoryLoginRequiredMsg } from "../misc/HistoryLoginRequiredMsg";
 import { ConnectedInstancesList } from "./ConnectedInstancesList";
+import { ClearingModal } from "./modals";
 
 export function ConnectedSidebar() {
   const session = useSession();
 
   const router = useRouter();
+
+  const [isClearingOpen, setIsClearingOpen] = React.useState(false);
 
   const {
     isSettingsOpen,
@@ -50,7 +53,11 @@ export function ConnectedSidebar() {
       {isAuthenticated && <ConnectedInstancesList />}
       <SidebarSection fitContent>
         {isAuthenticated && (
-          <SidebarLink icon={<ThrashIcon />} label="Clear conversations" />
+          <SidebarLink
+            icon={<ThrashIcon />}
+            label="Clear conversations"
+            onClick={() => setIsClearingOpen(true)}
+          />
         )}
         <SidebarLink
           icon={<SettingsIcon />}
@@ -68,6 +75,9 @@ export function ConnectedSidebar() {
           />
         )}
       </SidebarSection>
+      {isClearingOpen && (
+        <ClearingModal onClose={() => setIsClearingOpen(false)} />
+      )}
       {isSettingsOpen && (
         <SettingsModal
           initialSettings={settings}
