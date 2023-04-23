@@ -145,6 +145,13 @@ export class InstanceRepository {
     });
   }
 
+  async getCurrentBranch() {
+    return await git.currentBranch({
+      fs: this.fs,
+      dir: ROOT_DIR,
+    });
+  }
+
   updateChat(messages: IMessage[]) {
     this.fs.writeFileSync(ROOT_DIR + CHAT_FILE_PATH, JSON.stringify(messages));
   }
@@ -311,7 +318,8 @@ export class InstanceRepository {
 
     return {
       ...rest,
-      ref: await this.getCurrentRef(),
+      refHash: await this.getCurrentRef(),
+      refBranch: await this.getCurrentBranch(),
       messages: await this.getMessages(),
       commits: await this.getCommits(),
       branches: await this.getBranches(),

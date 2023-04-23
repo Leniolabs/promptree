@@ -12,15 +12,21 @@ export function Instance(
     title?: IInstance["title"];
     messages?: IInstance["messages"];
     commits?: IInstance["commits"];
-    pointer?: IInstance["ref"];
+
+    refHash: IInstance["refHash"];
+    refBranch: IInstance["refBranch"];
+
     branches?: IInstance["branches"];
     onMessage?: (message: string) => void;
     onMessageChange?: (message: IMessage) => void;
-    onSquash?: () => void;
-    onMerge?: (squash?: boolean) => void;
+
     onRegenerate?: () => void;
+
+    onNewBranch?: (hash: string) => void;
     onTrack?: (ref: string) => void;
-    onBranchCreate?: (ref: string) => void;
+
+    onMerge?: (ref?: string) => void;
+    onMergeSquash?: (ref?: string) => void;
   }>
 ) {
   return (
@@ -35,25 +41,29 @@ export function Instance(
           title={props.title}
           messages={props.messages}
           onMessageChange={props.onMessageChange}
-          onBranch={props.onBranchCreate}
+          onNewBranch={props.onNewBranch}
         />
         {props.onMessage && (
           <InstanceInput
             onSend={props.onMessage}
             onRegenerate={props.onRegenerate}
-            onSquash={props.onSquash}
             onMerge={props.onMerge}
+            onMergeSquash={props.onMergeSquash}
           />
         )}
       </div>
-      {props.commits && props.pointer && (
+      {props.commits && props.refHash && (
         <Tree
           commits={props.commits}
-          pointer={props.pointer}
+          refHash={props.refHash}
+          refBranch={props.refBranch}
           branches={props.branches || []}
           width={300}
           height={1000}
-          onCommitDoubleClick={props.onTrack}
+          onNewBranch={props.onNewBranch}
+          onTrack={props.onTrack}
+          onMerge={props.onMerge}
+          onMergeSquash={props.onMergeSquash}
         />
       )}
     </div>

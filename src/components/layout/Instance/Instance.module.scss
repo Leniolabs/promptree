@@ -6,7 +6,7 @@
 
   grid-template-columns: 1fr 360px;
   grid-template-rows: 1fr;
-  grid-template-areas: "content tree";
+  grid-template-areas: "content git";
 
   &:has(.instanceChatWrapper:only-child) {
     grid-template-columns: 1fr 0px;
@@ -21,14 +21,9 @@
     }
 
     &:has(> :only-child) {
-      // display: none;
-      // Add your styles here
-
       & > :first-child > :first-child {
         margin-bottom: 2rem;
       }
-
-      
     }
   }
 }

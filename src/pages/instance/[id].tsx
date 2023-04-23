@@ -41,7 +41,7 @@ export default function InstanceView(props: { id: InstanceResponse["id"] }) {
     setModeOptions({});
   }, []);
 
-  const handleBranchStart = React.useCallback((hash: string) => {
+  const handleNewBranchStart = React.useCallback((hash: string) => {
     setMode("CREATE_BRANCH");
     setModeOptions({ startPoint: hash });
   }, []);
@@ -60,7 +60,7 @@ export default function InstanceView(props: { id: InstanceResponse["id"] }) {
       if (chat.instance) {
         chat.merge({
           fromBranch: targetBranch,
-          toBranch: chat.instance.ref,
+          toBranch: chat.instance.refHash,
         });
         setMode(undefined);
         setModeOptions({});
@@ -69,7 +69,7 @@ export default function InstanceView(props: { id: InstanceResponse["id"] }) {
     [chat]
   );
 
-  const handleSquashStart = React.useMemo(() => {
+  const handleMergeSquashStart = React.useMemo(() => {
     if (chat.instance && chat.instance.branches.length > 1)
       return () => {
         setMode("SQUASH_MERGE");
@@ -96,15 +96,15 @@ export default function InstanceView(props: { id: InstanceResponse["id"] }) {
     (ref: string) => {
       if (chat.instance?.branches.find((branch) => branch.branch === ref))
         chat.checkout({ branchName: ref });
-      else return handleBranchStart(ref);
+      else return handleNewBranchStart(ref);
     },
-    [chat, handleBranchStart]
+    [chat, handleNewBranchStart]
   );
 
   const currentBranch = React.useMemo(() => {
     if (!chat.instance) return null;
     return chat.instance.branches.find(
-      (branch) => branch.hash === chat.instance?.ref
+      (branch) => branch.hash === chat.instance?.refHash
     );
   }, [chat]);
 
@@ -122,16 +122,17 @@ export default function InstanceView(props: { id: InstanceResponse["id"] }) {
                 messages={chat.instance.messages}
                 commits={chat.instance.commits}
                 branches={chat.instance.branches}
-                pointer={chat.instance.ref}
+                refHash={chat.instance.refHash}
+                refBranch={chat.instance.refBranch}
                 onMessage={apikey ? handleMessage : undefined}
                 onMessageChange={(message) => {
                   chat.editMessage(message.id, message.content);
                 }}
                 onRegenerate={handleRegenerate}
-                onBranchCreate={handleBranchStart}
+                onNewBranch={handleNewBranchStart}
                 onTrack={handleTrack}
                 onMerge={handleMergeStart}
-                onSquash={handleSquashStart}
+                onMergeSquash={handleMergeSquashStart}
               />
             </>
           ) : null}

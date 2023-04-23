@@ -1,9 +1,19 @@
-import { ChatCompletionRequestMessage, Configuration, OpenAIApi } from "openai";
+import {
+  ChatCompletionRequestMessage,
+  ChatCompletionResponseMessage,
+  Configuration,
+  OpenAIApi,
+} from "openai";
 
 export async function getResponse(
   apiKey: string,
   messages: ChatCompletionRequestMessage[]
-) {
+): Promise<ChatCompletionResponseMessage | undefined> {
+  return {
+    role: "assistant",
+    content: "sample",
+  };
+
   const configuration = new Configuration({
     apiKey,
   });

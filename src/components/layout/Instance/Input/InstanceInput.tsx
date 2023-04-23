@@ -7,9 +7,9 @@ import { Button } from "@/components/buttons/Button";
 export function InstanceInput(
   props: React.PropsWithChildren<{
     onSend?: (message: string) => void;
-    onSquash?: () => void;
-    onMerge?: () => void;
     onRegenerate?: () => void;
+    onMerge?: () => void;
+    onMergeSquash?: () => void;
   }>
 ) {
   const [message, setMessage] = React.useState("");
@@ -53,8 +53,8 @@ export function InstanceInput(
             Merge
           </Button>
         )}
-        {props.onSquash && (
-          <Button onClick={() => props.onSquash?.()}>
+        {props.onMergeSquash && (
+          <Button onClick={() => props.onMergeSquash?.()}>
             <SquashIcon />
             Squash & Merge
           </Button>

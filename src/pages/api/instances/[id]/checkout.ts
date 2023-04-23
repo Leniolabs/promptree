@@ -16,6 +16,7 @@ export default async function handler(
   const id = req.query?.id as string;
   if (!id) return res.status(404).send({});
 
+
   if (req.method === "POST") {
     const { branchName, create, startPoint, noUpdateHead } = req.body;
     if (!branchName) return res.status(400).send({});

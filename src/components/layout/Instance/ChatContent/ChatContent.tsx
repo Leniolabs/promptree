@@ -3,6 +3,7 @@ import { ChatMessage } from "./ChatMessage/ChatMessage";
 import styles from "./Chat.module.scss";
 import React from "react";
 import { className } from "@/utils/classname";
+import { useScrollToBottom } from "@/hooks";
 
 export function ChatContent(
   props: React.PropsWithChildren<{
@@ -10,18 +11,10 @@ export function ChatContent(
     title?: string;
     messages?: IMessage[];
     onMessageChange?: (message: IMessage) => void;
-    onBranch?: (hash: string) => void;
+    onNewBranch?: (hash: string) => void;
   }>
 ) {
-  const containerRef = React.useRef<HTMLDivElement>(null);
-
-  React.useEffect(() => {
-    const container = containerRef.current;
-    if (container)
-      if (container.scrollHeight > container.clientHeight) {
-        container.scrollTop = container.scrollHeight - container.clientHeight;
-      }
-  }, [props.messages]);
+  const containerRef = useScrollToBottom<HTMLDivElement>(props.messages);
 
   return (
     <div
@@ -35,7 +28,7 @@ export function ChatContent(
             key={message.id}
             message={message}
             onChange={props.onMessageChange}
-            onBranch={props.onBranch}
+            onNewBranch={props.onNewBranch}
           />
         ))}
       </div>

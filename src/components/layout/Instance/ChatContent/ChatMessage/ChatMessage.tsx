@@ -8,7 +8,7 @@ import { AssistantChatMessage } from "./AssistantChatMessage";
 export function ChatMessage(props: {
   message: IMessage;
   onChange?: (message: IMessage) => void;
-  onBranch?: (hash: string) => void;
+  onNewBranch?: (hash: string) => void;
 }) {
   return (
     <>
@@ -27,7 +27,7 @@ export function ChatMessage(props: {
         {props.message.author === "assistant" && (
           <AssistantChatMessage
             message={props.message}
-            onBranch={() => props.onBranch?.(props.message.id)}
+            onNewBranch={() => props.onNewBranch?.(props.message.id)}
           />
         )}
       </div>

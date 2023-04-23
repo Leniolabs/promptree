@@ -14,7 +14,7 @@ const components = {
 
 export function AssistantChatMessage(props: {
   message: IMessage;
-  onBranch?: () => void;
+  onNewBranch?: () => void;
 }) {
   const content = React.useMemo(() => {
     return (props.message.content || "")
@@ -34,8 +34,8 @@ export function AssistantChatMessage(props: {
         </div>
       </div>
       <div className={styles.chatMessageControls}>
-        {props.onBranch && (
-          <IconButton icon={<BranchIcon />} onClick={props.onBranch} />
+        {props.onNewBranch && (
+          <IconButton icon={<BranchIcon />} onClick={props.onNewBranch} />
         )}
       </div>
     </div>

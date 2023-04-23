@@ -5,7 +5,8 @@ export type IInstance = Omit<Instance, "content"> & {
   messages: IMessage[];
   commits: ICommit[];
   branches: IBranch[];
-  ref: string;
+  refHash: string;
+  refBranch: string;
 };
 
 export type InstanceResponse = IInstance;
