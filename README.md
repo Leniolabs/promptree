@@ -2,6 +2,10 @@
 
 [Promptree](https://promptree.leniolabs.com?utm_source=promptree&utm_medium=banner&utm_campaign=leniolabs&utm_content=promptree_github) is a platform that combines ChatGPT conversations with git. It allows you to create a chat, branch any message you want, and create a conversation from there. You can then merge these branches and move messages from one branch to another. Also, you can merge and squash the messages of the difference into just one question and one answer.
 
+#### Important notice
+
+We use the OpenAI API, so this app requires every user to set up their own OpenAI API key. We do not store that API key in the database and we don't even send the API key to the backend of the app. All the requests to the OpenAI's endpoint are done by the frontend and the key is stored locally in the user's local storage.
+
 ## Getting Started
 
 ### Deployed Version
