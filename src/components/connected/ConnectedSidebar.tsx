@@ -49,8 +49,11 @@ export function ConnectedSidebar() {
           border
         />
       </SidebarSection>
-      {isUnauthenticated && <HistoryLoginRequiredMsg />}
-      {isAuthenticated && <ConnectedInstancesList />}
+      {isUnauthenticated ? (
+        <HistoryLoginRequiredMsg />
+      ) : (
+        <ConnectedInstancesList />
+      )}
       <SidebarSection fitContent>
         {isAuthenticated && (
           <SidebarLink
@@ -64,10 +67,9 @@ export function ConnectedSidebar() {
           label="Settings"
           onClick={openSettings}
         />
-        {isUnauthenticated && (
+        {isUnauthenticated ? (
           <SidebarLink href="/login" icon={<LoginIcon />} label="Login" />
-        )}
-        {isAuthenticated && (
+        ) : (
           <SidebarLink
             onClick={() => signOut()}
             icon={<LogoutIcon />}
