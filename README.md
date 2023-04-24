@@ -1,38 +1,61 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Promptree
+
+[Promptree](https://promptree.leniolabs.com?utm_source=promptree&utm_medium=banner&utm_campaign=leniolabs&utm_content=promptree_github) is a platform that combines ChatGPT conversations with git. It allows you to create a chat, branch any message you want, and create a conversation from there. You can then merge these branches and move messages from one branch to another. Also, you can merge and squash the messages of the difference into just one question and one answer.
 
 ## Getting Started
 
-First, run the development server:
+### Deployed Version
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
+You can access the deployed version of Promptree at [promptree.leniolabs.com](https://promptree.leniolabs.com?utm_source=promptree&utm_medium=banner&utm_campaign=leniolabs&utm_content=promptree_github)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Local Development
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+To run Promptree locally, follow these steps:
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+Clone this repository using `git clone https://github.com/Leniolabs/promptree.git`.
+Install dependencies using `npm install`.
+Start the development server using `npm run dev`.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+## Database Configuration
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+In development, Promptree uses a remote database, which can be configured by setting the `DATABASE_URL` in the `.env` file. 
+By default, we have the connection URL of a PostgreSQL database running on Docker. You can run it by using the command:
 
-## Learn More
+`docker-compose up`
 
-To learn more about Next.js, take a look at the following resources:
+or, if you are using a Mac with an M1 chip:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+`docker-compose -f docker-compose.m1.yaml up` 
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+After the database is up and running you can push the migrations by running:
 
-## Deploy on Vercel
+`npx prisma migrate dev`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Tech Stack
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Promptree is built with the following technologies:
+
+- NextJS
+- Prisma.io
+- isomorphic-git
+- memfs
+- next-auth
+- highlight.js
+- gitgraph
+
+`isomorphic-git` is used in conjunction with `memfs` to create a repository for every chat that you start. This repository will hold a file called `chat.json` where the JSON of the messages in the chat will be stored. Every combination of question + answer is a commit in this repository. Later, we serialize this `memfs` volume instance and save it into the database using Prisma.
+
+`Highlight.js` is used to render the responses that OpenAI's chat API returns, formatting them in a similar way than ChatGPT does.
+
+`gitgraph` is the library we use to calculate the Git tree.
+
+## Contributing
+
+We welcome contributions from the community. Any [new ideas](https://github.com/leniolabs/layoutit-grid/issues/new) on what should we implement or bug reports are welcome.
+
+## License
+
+Promptree is open-source software licensed under the `MIT license`(LICENSE).
+
+## Creators
+Promptree is crafted with love by [Leniolabs](https://www.leniolabs.com/services/team-augmentation/?utm_source=promptree&utm_medium=banner&utm_campaign=leniolabs&utm_content=promptree_github) and a growing community of contributors. We build digital experiences with your ideas. [Get in touch!](https://www.leniolabs.com/services/team-augmentation/?utm_source=promptree&utm_medium=banner&utm_campaign=leniolabs&utm_content=promptree_github)
