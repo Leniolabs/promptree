@@ -77,8 +77,13 @@
 
     button {
       position: absolute;
+      padding: 0.25rem;
       right: 0.5rem;
       bottom: 0.75rem;
+
+      svg {
+        margin-right: 0.25rem;
+      }
     }
   }
 }
