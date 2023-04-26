@@ -58,6 +58,7 @@ export function Commit(props: CommitProps) {
           <div className={styles.message}>
             {refs?.map((ref) => (
               <div
+                key={ref.name}
                 className={styles.branchTag}
                 onDoubleClick={handleDoubleClick(ref.name)}
               >

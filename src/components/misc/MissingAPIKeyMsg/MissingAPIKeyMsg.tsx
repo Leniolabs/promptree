@@ -11,7 +11,7 @@ export function MissingAPIKeyMsg() {
         <div>
           You have to{" "}
           <ButtonLink onClick={openSettings}>
-            configure your OpenAI's API KEY
+            configure your OpenAI{"'"}s API KEY
           </ButtonLink>{" "}
           in order to use this tool
         </div>
