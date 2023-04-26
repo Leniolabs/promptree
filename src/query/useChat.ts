@@ -247,7 +247,7 @@ export function useChat(id: Instance["id"]) {
   };
 }
 
-export function useSquashChat(id: Instance["id"], ref: IInstance["ref"]) {
+export function useSquashChat(id: Instance["id"], ref: IInstance["refHash"]) {
   const queryClient = useQueryClient();
   const apikey = useAPIKey();
 

@@ -13,8 +13,8 @@ export function Instance(
     messages?: IInstance["messages"];
     commits?: IInstance["commits"];
 
-    refHash: IInstance["refHash"];
-    refBranch: IInstance["refBranch"];
+    refHash?: IInstance["refHash"];
+    refBranch?: IInstance["refBranch"];
 
     branches?: IInstance["branches"];
     onMessage?: (message: string) => void;
@@ -52,7 +52,7 @@ export function Instance(
           />
         )}
       </div>
-      {props.commits && props.refHash && (
+      {props.commits && props.refHash && props.refBranch && (
         <Tree
           commits={props.commits}
           refHash={props.refHash}
