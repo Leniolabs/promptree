@@ -5,6 +5,7 @@ import { EditIcon } from "@/components/icons/EditIcon";
 import { Button } from "@/components/buttons/Button";
 import { UserIcon } from "@/components/icons/UserIcon";
 import { IMessage } from "@/types/chat";
+import { UserImage } from "@/components/connected";
 
 export function UserChatMessage(props: {
   message: IMessage;
@@ -37,7 +38,7 @@ export function UserChatMessage(props: {
   return (
     <div className={styles.chatMessageWrapper}>
       <div className={styles.chatMessageIcon}>
-        <UserIcon />
+        <UserImage />
       </div>
       <div className={styles.chatMessageContent}>
         <div className={styles.chatText}>
