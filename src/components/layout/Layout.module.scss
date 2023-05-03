@@ -17,7 +17,8 @@
 .sidebar {
   position: relative;
   grid-area: sidebar;
-  background: rgba(32, 33, 35);
+  background: var(--sidebar-bg-color);
+  color: var(--sidebar-font-color);
 
   max-height: 100vh;
 
@@ -31,7 +32,7 @@
 .content {
   position: relative;
   grid-area: content;
-  background: #444654;
+  background: transparent;
 }
 
 .columns {

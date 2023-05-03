@@ -6,20 +6,24 @@
   display: inline-flex;
 
   gap: 0.5rem;
-  border-radius: 0.5rem;
+  border-radius: 0.25rem;
 
   padding: 0.5rem 0.75rem;
 
   align-items: center;
 
-  background-color: rgba(52, 53, 65);
-  color: rgba(217, 217, 227);
+  background-color: var(--background-color);
+  color: var(--font-color);
 
-  border: 1px solid rgba(86, 88, 105);
+  border: 1px solid var(--border-color);
 
   &:hover {
-    color: rgba(217, 217, 227);
-    background-color: rgba(64, 65, 79);
+    background-color: rgba(236, 236, 241);
+
+    @media (prefers-color-scheme: dark) {
+      color: rgba(217, 217, 227);
+      background-color: rgba(64, 65, 79);
+    }
   }
 
   &.success {
@@ -87,6 +91,7 @@
 
 .sendButton {
   cursor: pointer;
+  display: flex;
 
   color: rgba(142, 142, 160);
 
@@ -98,9 +103,20 @@
   background: transparent;
   background-image: none;
 
-  &:hover {
-    color: rgba(172, 172, 190);
-    background-color: rgba(32, 33, 35);
+  &.disabled {
+    cursor: auto;
+    opacity: 0.4;
+  }
+
+  &:not(.disabled) {
+    &:hover {
+      background-color: rgba(236, 236, 241);
+
+      @media (prefers-color-scheme: dark) {
+        color: rgba(217, 217, 227);
+        background-color: rgba(32, 33, 35);
+      }
+    }
   }
 }
 

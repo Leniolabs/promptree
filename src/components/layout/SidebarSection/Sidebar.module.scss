@@ -66,6 +66,8 @@ button.sidebarLink {
   display: flex;
   position: relative;
 
+  color: var(--sidebar-font-color);
+
   border-radius: 0.375rem;
   font-size: 0.875rem;
   line-height: 1.25rem;
@@ -155,6 +157,7 @@ button.sidebarLink {
       border-radius: 0px;
       font-size: 0.875rem;
       line-height: 1.25rem;
+      color: inherit;
     }
   }
 }
