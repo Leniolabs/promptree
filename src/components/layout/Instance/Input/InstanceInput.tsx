@@ -68,7 +68,7 @@ export function InstanceInput(
       </div>
       <div className={styles.instanceTextInputWrapper}>
         <textarea
-          placeholder="Send a message..."
+          placeholder="Send a message."
           className={styles.instanceTextArea}
           value={message}
           onChange={handleMessageChange}
@@ -80,7 +80,7 @@ export function InstanceInput(
               : { overflowY: "hidden" }),
           }}
         />
-        <SendButton onClick={handleSend} />
+        <SendButton disabled={!message} onClick={handleSend} />
       </div>
     </div>
   );

@@ -7,7 +7,8 @@
   grid-template-columns: 1fr;
   grid-template-areas: "toolbar" "tree";
 
-  background: rgb(32, 33, 35);
+  background: var(--sidebar-bg-color);
+  color: var(--sidebar-font-color);
 
   .gitToolbar {
     grid-area: toolbar;
@@ -31,6 +32,8 @@
     .toolbarButton {
       border: none;
       background: none;
+
+      color: inherit;
 
       padding: 2px 10px;
 

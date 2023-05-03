@@ -7,7 +7,11 @@
 
   color: white;
 
-  background: linear-gradient(180deg, rgba(53, 55, 64, 0), #353740 58.85%);
+  background: linear-gradient(180deg, hsla(0, 0%, 100%, 0) 13.94%, #fff 54.73%);
+
+  @media (prefers-color-scheme: dark) {
+    background: linear-gradient(180deg, rgba(53, 55, 64, 0), #353740 58.85%);
+  }
 
   &.hasTree {
     width: calc(100% - 260px);
@@ -31,7 +35,11 @@
     margin-right: auto;
     margin-bottom: 1.5rem;
 
-    background-color: rgba(64, 65, 79);
+    background-color: var(--background-color);
+
+    @media (prefers-color-scheme: dark) {
+      background-color: rgba(64, 65, 79);
+    }
 
     padding-left: 1rem;
 
@@ -39,7 +47,11 @@
     padding-top: 0.75rem;
 
     border-radius: 0.375rem;
-    border: 1px solid rgba(32, 33, 35, 0.5);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+
+    @media (prefers-color-scheme: dark) {
+      border-color: rgba(32, 33, 35, 0.5);
+    }
 
     box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px,
       rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 0px 15px 0px;
@@ -72,6 +84,12 @@
 
       &::-webkit-scrollbar-thumb {
         visibility: visible;
+      }
+    }
+
+    textarea:empty {
+      button {
+        opacity: 0.4;
       }
     }
 

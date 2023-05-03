@@ -5,10 +5,34 @@
   --border-radius: 12px;
   --font: "Roboto", sans-serif;
 
-  --foreground-rgb: 255, 255, 255;
-  --background-rgb: 0, 0, 0;
+  --border-light-color: rgba(0, 0, 0, 0.1);
+  --border-dark-color: rgba(86, 88, 105);
 
-  --border-color: hsla(0, 0%, 100%, 0.1);
+  --font-dark-color: rgb(236, 236, 241);
+  --font-light-color: rgb(0, 0, 0);
+
+  --content-bg-dark-color: rgb(52, 53, 65);
+  --content-bg-light-color: rgb(255, 255, 255);
+
+  --sidebar-font-color: var(--font-dark-color);
+  /* --sidebar-font-disabled-color: rgba(var(--font-dark-color), 0.7); */
+  --sidebar-bg-color: rgb(32, 33, 35);
+
+  --message-bg-assistant-dark-color: rgb(68, 70, 84);
+  --message-bg-assistant-light-color: rgb(247, 247, 248);
+
+  --message-font-assistant-dark-color: var(--font-dark-color);
+  --message-font-assistant-light-color: rgb(209, 213, 219);
+
+  --message-bg-user-color: transparent;
+  --message-font-user-color: var(--font-dark-color);
+  --message-bg-assistant-color: var(--message-bg-assistant-light-color);
+  --message-font-assistant-color: var(--message-font-assistant-light-color);
+
+  --border-color: var(--border-light-color);
+
+  --font-color: var(--font-light-color);
+  --background-color: var(--content-bg-light-color);
 }
 
 input,
@@ -18,8 +42,13 @@ textarea {
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-rgb: 0, 0, 0;
+    --font-color: var(--font-dark-color);
+    --background-color: var(--content-bg-dark-color);
+
+    --border-color: var(--border-dark-color);
+
+    --message-font-assistant-color: var(--message-font-assistant-dark-color);
+    --message-bg-assistant-color: var(--message-bg-assistant-dark-color);
   }
 }
 
@@ -35,7 +64,7 @@ body {
   overflow-x: hidden;
 
   font-family: var(--font);
-  color: rgb(236, 236, 241);
+  color: var(--font-color);
 }
 
 #__next {
@@ -45,8 +74,6 @@ body {
 body {
   line-height: inherit;
   margin: 0;
-  color: rgb(var(--foreground-rgb));
-  background: rgb(var(--background-start-rgb));
 }
 
 a {

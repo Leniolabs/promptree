@@ -3,7 +3,7 @@
   overflow-y: auto;
   width: 100%;
   min-height: 30vh;
-  background: rgb(52, 53, 65);
+  background: var(--background-color);
 
   &:hover {
     &::-webkit-scrollbar-thumb {
@@ -20,7 +20,12 @@
       font-size: 0.875rem;
       line-height: 1.25rem;
       padding: 0.75rem;
-      background-color: rgb(64, 65, 79);
+      background-color: var(--message-bg-assistant-color);
+      color: rgba(142, 142, 160);
+
+      @media (prefers-color-scheme: dark) {
+        color: rgba(197, 197, 210);
+      }
     }
 
     .chatMessage {
@@ -34,12 +39,12 @@
 
       --branch-color: #d58314;
 
-      &.chat-system {
-        background-color: rgba(127, 53, 65, 0.5);
-      }
+      // &.chat-system {
+      //   background-color: rgba(127, 53, 65, 0.5);
+      // }
 
       &.chat-user {
-        background-color: rgba(52, 53, 65);
+        background: var(--message-bg-user-color);
 
         textarea {
           width: 100%;
@@ -54,7 +59,12 @@
       }
 
       &.chat-assistant {
-        background-color: rgba(68, 70, 84);
+        background: var(--message-bg-assistant-color);
+        color: var(--message-font-assistant-color);
+
+        .chatMessageIcon {
+          background: rgb(16, 163, 127);
+        }
       }
 
       .chatMessageWrapper {
@@ -98,7 +108,7 @@
       .chatMessageIcon {
         height: 30px;
         width: 30px;
-        background: black;
+        background: var(--background-color);
         display: flex;
         place-content: center;
         align-items: center;
@@ -547,22 +557,58 @@
           vertical-align: top;
         }
         .prose {
-          --tw-prose-body: #d1d5db;
-          --tw-prose-headings: #fff;
-          --tw-prose-lead: #9ca3af;
-          --tw-prose-links: #fff;
-          --tw-prose-bold: #fff;
-          --tw-prose-counters: #9ca3af;
-          --tw-prose-bullets: #4b5563;
-          --tw-prose-hr: #374151;
-          --tw-prose-quotes: #f3f4f6;
-          --tw-prose-quote-borders: #374151;
-          --tw-prose-captions: #9ca3af;
-          --tw-prose-code: #fff;
-          --tw-prose-pre-code: #d1d5db;
-          --tw-prose-pre-bg: rgba(0, 0, 0, 0.5);
-          --tw-prose-th-borders: #4b5563;
-          --tw-prose-td-borders: #374151;
+          --tw-prose-body: #374151;
+          --tw-prose-headings: #111827;
+          --tw-prose-lead: #4b5563;
+          --tw-prose-links: #111827;
+          --tw-prose-bold: #111827;
+          --tw-prose-counters: #6b7280;
+          --tw-prose-bullets: #d1d5db;
+          --tw-prose-hr: #e5e7eb;
+          --tw-prose-quotes: #111827;
+          --tw-prose-quote-borders: #e5e7eb;
+          --tw-prose-captions: #6b7280;
+          --tw-prose-code: #111827;
+          --tw-prose-pre-code: #e5e7eb;
+          --tw-prose-pre-bg: #1f2937;
+          --tw-prose-th-borders: #d1d5db;
+          --tw-prose-td-borders: #e5e7eb;
+          --tw-prose-invert-body: #d1d5db;
+          --tw-prose-invert-headings: #fff;
+          --tw-prose-invert-lead: #9ca3af;
+          --tw-prose-invert-links: #fff;
+          --tw-prose-invert-bold: #fff;
+          --tw-prose-invert-counters: #9ca3af;
+          --tw-prose-invert-bullets: #4b5563;
+          --tw-prose-invert-hr: #374151;
+          --tw-prose-invert-quotes: #f3f4f6;
+          --tw-prose-invert-quote-borders: #374151;
+          --tw-prose-invert-captions: #9ca3af;
+          --tw-prose-invert-code: #fff;
+          --tw-prose-invert-pre-code: #d1d5db;
+          --tw-prose-invert-pre-bg: rgba(0, 0, 0, 0.5);
+          --tw-prose-invert-th-borders: #4b5563;
+          --tw-prose-invert-td-borders: #374151;
+
+          @media (prefers-color-scheme: dark) {
+            --tw-prose-body: var(--tw-prose-invert-body);
+            --tw-prose-headings: var(--tw-prose-invert-headings);
+            --tw-prose-lead: var(--tw-prose-invert-lead);
+            --tw-prose-links: var(--tw-prose-invert-links);
+            --tw-prose-bold: var(--tw-prose-invert-bold);
+            --tw-prose-counters: var(--tw-prose-invert-counters);
+            --tw-prose-bullets: var(--tw-prose-invert-bullets);
+            --tw-prose-hr: var(--tw-prose-invert-hr);
+            --tw-prose-quotes: var(--tw-prose-invert-quotes);
+            --tw-prose-quote-borders: var(--tw-prose-invert-quote-borders);
+            --tw-prose-captions: var(--tw-prose-invert-captions);
+            --tw-prose-code: var(--tw-prose-invert-code);
+            --tw-prose-pre-code: var(--tw-prose-invert-pre-code);
+            --tw-prose-pre-bg: var(--tw-prose-invert-pre-bg);
+            --tw-prose-th-borders: var(--tw-prose-invert-th-borders);
+            --tw-prose-td-borders: var(--tw-prose-invert-td-borders);
+          }
+
           font-size: 1rem;
           line-height: 1.75;
         }

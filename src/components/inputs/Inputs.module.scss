@@ -2,8 +2,8 @@
   width: 100%;
   input {
     width: 100%;
-    background: rgba(64, 65, 79);
-    border: none;
+    background: var(--background-color);
+    border: 1px solid var(--border-color);
 
     font-size: 1rem;
     line-height: 1.5rem;
@@ -15,12 +15,14 @@
 .selectWrapper {
   width: 100%;
   select {
-    background: rgba(64, 65, 79);
-    border: none;
+    background: var(--background-color);
+    border: 1px solid var(--border-color);
 
     font-size: 1rem;
     line-height: 1.5rem;
 
     padding: 0.25rem;
+
+    min-width: 100px;
   }
 }

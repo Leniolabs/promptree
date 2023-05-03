@@ -22,7 +22,7 @@ export function ChatContent(
       className={className(styles.chatContent, props.className)}
     >
       <div className={styles.chatMessages}>
-        <div className={styles.chatTitle}>{props.title}</div>
+        {props.title && <div className={styles.chatTitle}>{props.title}</div>}
         {props.messages?.map((message) => (
           <ChatMessage
             key={message.id}
