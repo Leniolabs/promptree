@@ -715,3 +715,19 @@
     }
   }
 }
+
+.chatEmptyContentWrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  margin-bottom: 0 !important;
+  user-select: none;
+
+  .chatEmptyContent {
+    margin: auto;
+    color: rgba(86, 88, 105);
+    font-weight: 600;
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+  }
+}
