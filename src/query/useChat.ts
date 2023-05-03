@@ -26,8 +26,9 @@ export function useCreateChat(onCreate?: (instance: IInstance) => void) {
   const send = React.useCallback(
     (content: string) => {
       const userMessage = createMessage("user", content);
+      const assistantMessage = createMessage("assistant", "");
 
-      setMessages([userMessage]);
+      setMessages([userMessage, assistantMessage]);
 
       const currentMessageList = [
         {
@@ -36,24 +37,32 @@ export function useCreateChat(onCreate?: (instance: IInstance) => void) {
         },
       ] as ChatCompletionRequestMessage[];
 
-      getResponse(apikey, currentMessageList).then(async (response) => {
-        if (response) {
-          const assistantMessage = createMessage("assistant", response.content);
+      const handleChunk = (chunk: string) => {
+        assistantMessage.content += chunk;
 
-          const title = await createInstanceTitle(apikey, [
-            userMessage,
-            assistantMessage,
-          ]);
+        setMessages([userMessage, assistantMessage]);
+      };
 
-          createAsync({
-            messages: [userMessage, assistantMessage],
-            title,
-          }).then((created) => {
-            onCreate?.(created);
-            setMessages([userMessage, assistantMessage]);
-          });
+      getResponse(apikey, currentMessageList, handleChunk).then(
+        async (response) => {
+          if (response) {
+            assistantMessage.content = response.content;
+
+            const title = await createInstanceTitle(apikey, [
+              userMessage,
+              assistantMessage,
+            ]);
+
+            createAsync({
+              messages: [userMessage, assistantMessage],
+              title,
+            }).then((created) => {
+              onCreate?.(created);
+              setMessages([userMessage, assistantMessage]);
+            });
+          }
         }
-      });
+      );
     },
     [apikey, onCreate]
   );
@@ -79,6 +88,7 @@ export function useChat(id: Instance["id"]) {
     (content: string) => {
       if (instance) {
         const userMessage = createMessage("user", content);
+        const assistantMessage = createMessage("assistant", "");
 
         const currentMessagesList = [
           ...instance.messages,
@@ -86,7 +96,7 @@ export function useChat(id: Instance["id"]) {
         ] as IMessage[];
 
         updateLocal({
-          messages: currentMessagesList,
+          messages: [...currentMessagesList, assistantMessage],
         });
 
         const currentMessageList = currentMessagesList.map((message) => {
@@ -96,26 +106,33 @@ export function useChat(id: Instance["id"]) {
           };
         }) as ChatCompletionRequestMessage[];
 
-        getResponse(apikey, currentMessageList).then((response) => {
-          if (response) {
-            const assistantMessage = createMessage(
-              "assistant",
-              response.content
-            );
+        const handleChunk = (chunk: string) => {
+          assistantMessage.content += chunk;
 
-            addMessagesAsync(id, {
-              messages: [userMessage, assistantMessage] as IMessage[],
-            });
+          updateLocal({
+            messages: [...currentMessagesList, assistantMessage],
+          });
+        };
 
-            updateLocal({
-              messages: [
-                ...instance.messages,
-                userMessage,
-                assistantMessage,
-              ] as IMessage[],
-            });
+        getResponse(apikey, currentMessageList, handleChunk).then(
+          (response) => {
+            if (response) {
+              assistantMessage.content = response.content;
+
+              addMessagesAsync(id, {
+                messages: [userMessage, assistantMessage] as IMessage[],
+              });
+
+              updateLocal({
+                messages: [
+                  ...instance.messages,
+                  userMessage,
+                  assistantMessage,
+                ] as IMessage[],
+              });
+            }
           }
-        });
+        );
       }
     },
     [apikey, instance]
@@ -130,13 +147,15 @@ export function useChat(id: Instance["id"]) {
         const userMessage = instance.messages[messageIndex];
         userMessage.content = content;
 
+        const assistantMessage = createMessage("assistant", "");
+
         const currentMessagesList = [
           ...instance.messages.slice(0, messageIndex),
           userMessage,
         ] as IMessage[];
 
         updateLocal({
-          messages: currentMessagesList,
+          messages: [...currentMessagesList, assistantMessage],
         });
 
         const currentMessageList = currentMessagesList.map((message) => {
@@ -146,27 +165,34 @@ export function useChat(id: Instance["id"]) {
           };
         }) as ChatCompletionRequestMessage[];
 
-        getResponse(apikey, currentMessageList).then((response) => {
-          if (response) {
-            const assistantMessage = createMessage(
-              "assistant",
-              response.content
-            );
+        const handleChunk = (chunk: string) => {
+          assistantMessage.content += chunk;
 
-            addMessagesAsync(id, {
-              messages: [userMessage, assistantMessage] as IMessage[],
-              edit: true,
-            });
+          updateLocal({
+            messages: [...currentMessagesList, assistantMessage],
+          });
+        };
 
-            updateLocal({
-              messages: [
-                ...instance.messages,
-                userMessage,
-                assistantMessage,
-              ] as IMessage[],
-            });
+        getResponse(apikey, currentMessageList, handleChunk).then(
+          (response) => {
+            if (response) {
+              assistantMessage.content = response.content;
+
+              addMessagesAsync(id, {
+                messages: [userMessage, assistantMessage] as IMessage[],
+                edit: true,
+              });
+
+              updateLocal({
+                messages: [
+                  ...instance.messages,
+                  userMessage,
+                  assistantMessage,
+                ] as IMessage[],
+              });
+            }
           }
-        });
+        );
       }
     },
     [apikey, instance]
@@ -177,13 +203,15 @@ export function useChat(id: Instance["id"]) {
       const userMessages = instance.messages.filter((x) => x.author === "user");
       const userMessage = userMessages[userMessages.length - 1];
 
+      const assistantMessage = createMessage("assistant", "");
+
       const currentMessagesList = [
         ...instance.messages.slice(0, -2),
         userMessage,
       ] as IMessage[];
 
       updateLocal({
-        messages: currentMessagesList,
+        messages: [...currentMessagesList, assistantMessage],
       });
 
       const currentMessageList = currentMessagesList.map((message) => {
@@ -193,9 +221,17 @@ export function useChat(id: Instance["id"]) {
         };
       }) as ChatCompletionRequestMessage[];
 
-      getResponse(apikey, currentMessageList).then((response) => {
+      const handleChunk = (chunk: string) => {
+        assistantMessage.content += chunk;
+
+        updateLocal({
+          messages: [...currentMessagesList, assistantMessage],
+        });
+      };
+
+      getResponse(apikey, currentMessageList, handleChunk).then((response) => {
         if (response) {
-          const assistantMessage = createMessage("assistant", response.content);
+          assistantMessage.content = response.content;
 
           addMessagesAsync(id, {
             messages: [userMessage, assistantMessage] as IMessage[],
@@ -271,7 +307,6 @@ export function useSquashChat(id: Instance["id"], ref: IInstance["refHash"]) {
   );
 
   React.useEffect(() => {
-    console.log(id, ref, targetBranch);
     if (ref && targetBranch) {
       setLoadingDifference(true);
       initSquashInstance(id, {
