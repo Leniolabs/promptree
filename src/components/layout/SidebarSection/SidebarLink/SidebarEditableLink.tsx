@@ -27,25 +27,25 @@ export function SidebarEditableLink(props: {
     setEdditting(false);
   }, []);
 
+  const handleSave = React.useCallback(() => {
+    props.onSave?.(newLabel);
+    setEdditting(false);
+  }, [newLabel, props.onSave]);
+
   if (editting) {
     return (
       <SidebarEditLink
         {...props}
         extra={
           <>
-            <SmallIconButton
-              icon={<CheckIcon />}
-              onClick={() => {
-                props.onSave?.(newLabel);
-                setEdditting(false);
-              }}
-            />
+            <SmallIconButton icon={<CheckIcon />} onClick={handleSave} />
             <SmallIconButton onClick={handleCancel} icon={<CancelIcon />} />
           </>
         }
         value={props.label}
         onChange={setNewLabel}
         onBlur={handleCancel}
+        onSave={handleSave}
       />
     );
   }
