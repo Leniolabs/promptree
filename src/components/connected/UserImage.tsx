@@ -1,13 +1,11 @@
 import { useSession } from "next-auth/react";
 import { UserIcon } from "../icons";
 
-export function UserImage() {
-  const session = useSession();
-
-  if (session?.data?.user?.image)
+export function UserImage(props: { avatar?: string }) {
+  if (props.avatar)
     return (
       <img
-        src={session?.data?.user?.image || ""}
+        src={props.avatar || ""}
         alt="user image"
         style={{ width: 30, height: 30 }}
       />

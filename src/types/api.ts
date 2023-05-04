@@ -9,6 +9,8 @@ export type IInstance = Omit<Instance, "content"> & {
   refBranch: string;
 };
 
+export type IInstanceConfig = Pick<IInstance, "public">;
+
 export type InstanceResponse = IInstance;
 export type InstanceListResponse = Pick<Instance, "id" | "title">[];
 

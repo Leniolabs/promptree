@@ -212,19 +212,6 @@ export class InstanceRepository {
     });
   }
 
-  async editMessages(messages: IMessage[]) {
-    if (messages.length) {
-      const currentChat = await this.getMessages();
-      const messageIndex = currentChat.findIndex(
-        (x) => x.id === messages[0].id
-      );
-
-      if (messageIndex !== -1) {
-        this.updateChat([...currentChat.slice(0, messageIndex), ...messages]);
-      }
-    }
-  }
-
   async addMessages(
     messages: IMessage[],
     options?: { regenerate?: boolean; edit?: boolean },
@@ -236,10 +223,22 @@ export class InstanceRepository {
         (x) => x.id === messages[0].id
       );
       if (messageIndex !== -1) {
-        this.updateChat([...currentChat.slice(0, messageIndex), ...messages]);
+        this.updateChat([
+          ...currentChat.slice(0, messageIndex),
+          ...messages.map((m) => ({
+            ...m,
+            userId: m.author === "user" ? user?.id : undefined,
+          })),
+        ]);
       }
     } else {
-      this.updateChat([...currentChat, ...messages]);
+      this.updateChat([
+        ...currentChat,
+        ...messages.map((m) => ({
+          ...m,
+          userId: m.author === "user" ? user?.id : undefined,
+        })),
+      ]);
     }
 
     await git.add({
@@ -320,7 +319,12 @@ export class InstanceRepository {
       ...rest,
       refHash: await this.getCurrentRef(),
       refBranch: await this.getCurrentBranch(),
-      messages: await this.getMessages(),
+      messages: (await this.getMessages()).map((m) => ({
+        id: m.id,
+        avatar: "userId" in m ? `/api/avatars/${m.userId}` : undefined,
+        content: m.content,
+        author: m.author,
+      })),
       commits: await this.getCommits(),
       branches: await this.getBranches(),
     };

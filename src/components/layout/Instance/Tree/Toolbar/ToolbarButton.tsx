@@ -1,5 +1,5 @@
 import { className } from "@/utils/classname";
-import styles from "../Tree.module.scss";
+import styles from "./Toolbar.module.scss";
 
 export function ToolbarButton(
   props: React.PropsWithChildren<{

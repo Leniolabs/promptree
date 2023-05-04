@@ -6,6 +6,17 @@ export async function getUserByEmail(email: string) {
   });
 }
 
+export async function getUserImageById(id: string) {
+  return (
+    await prisma.user.findFirst({
+      where: { id },
+      select: {
+        image: true,
+      },
+    })
+  )?.image;
+}
+
 export async function getInstanceById(id: string) {
   return prisma.instance.findUnique({
     where: {

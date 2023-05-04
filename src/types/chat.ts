@@ -25,6 +25,7 @@ export type IMessage = {
   id: string;
   author: "system" | "user" | "assistant";
   content: string;
+  avatar?: string;
 };
 
 export type ICommit = {

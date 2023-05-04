@@ -1,5 +1,5 @@
 import { getResponse } from "@/ai/openai";
-import { IInstance } from "@/types/api";
+import { IInstance, IInstanceConfig } from "@/types/api";
 import { ICheckoutOptions, IMergeOptions, IMessage } from "@/types/chat";
 import {
   createInstanceTitle,
@@ -82,6 +82,7 @@ export function useChat(id: Instance["id"]) {
     checkoutAsync,
     mergeAsync,
     refresh,
+    updateAsync,
   } = useInstance(id);
 
   const send = React.useCallback(
@@ -272,6 +273,21 @@ export function useChat(id: Instance["id"]) {
     [instance]
   );
 
+  const changeConfig = React.useCallback(
+    (config: IInstanceConfig) => {
+      if (instance) {
+        updateLocal({
+          ...config,
+        });
+
+        updateAsync(instance.id, {
+          ...config,
+        });
+      }
+    },
+    [instance]
+  );
+
   return {
     instance,
     send,
@@ -280,6 +296,7 @@ export function useChat(id: Instance["id"]) {
     regenerateLastNode,
     checkout,
     refresh,
+    changeConfig,
   };
 }
 

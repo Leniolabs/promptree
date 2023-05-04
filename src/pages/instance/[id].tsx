@@ -10,12 +10,15 @@ import {
 import { GetServerSidePropsContext } from "next";
 import { Instance } from "@/components/layout/Instance";
 import { useChat } from "@/query/useChat";
-import { InstanceResponse } from "@/types/api";
+import { IInstanceConfig, InstanceResponse } from "@/types/api";
 import { useAPIKey } from "@/store";
 import { getSession } from "next-auth/react";
 import { getInstanceById, getUserByEmail } from "@/utils/queries";
 
-export default function InstanceView(props: { id: InstanceResponse["id"] }) {
+export default function InstanceView(props: {
+  id: InstanceResponse["id"];
+  isOwner: boolean;
+}) {
   const chat = useChat(props.id);
 
   const apikey = useAPIKey();
@@ -101,6 +104,13 @@ export default function InstanceView(props: { id: InstanceResponse["id"] }) {
     [chat, handleNewBranchStart]
   );
 
+  const handleConfigChange = React.useCallback(
+    (config: IInstanceConfig) => {
+      chat.changeConfig(config);
+    },
+    [chat]
+  );
+
   const currentBranch = React.useMemo(() => {
     if (!chat.instance) return null;
     return chat.instance.branches.find(
@@ -124,15 +134,21 @@ export default function InstanceView(props: { id: InstanceResponse["id"] }) {
                 branches={chat.instance.branches}
                 refHash={chat.instance.refHash}
                 refBranch={chat.instance.refBranch}
-                onMessage={apikey ? handleMessage : undefined}
-                onMessageChange={(message) => {
-                  chat.editMessage(message.id, message.content);
-                }}
-                onRegenerate={handleRegenerate}
-                onNewBranch={handleNewBranchStart}
-                onTrack={handleTrack}
-                onMerge={handleMergeStart}
-                onMergeSquash={handleMergeSquashStart}
+                {...(apikey && props.isOwner
+                  ? {
+                      onMessage: handleMessage,
+                      onMessageChange: (message) => {
+                        chat.editMessage(message.id, message.content);
+                      },
+                      onRegenerate: handleRegenerate,
+                      onNewBranch: handleNewBranchStart,
+                      onTrack: handleTrack,
+                      onMerge: handleMergeStart,
+                      onMergeSquash: handleMergeSquashStart,
+                      onConfigChange: handleConfigChange,
+                      config: { public: chat.instance.public },
+                    }
+                  : {})}
               />
             </>
           ) : null}
@@ -188,6 +204,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   return {
     props: {
       id,
+      isOwner: instance.userId === user?.id,
     },
   };
 }

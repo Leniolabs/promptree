@@ -19,15 +19,16 @@ export function ChatMessage(props: {
         )}
       >
         {props.message.author === "user" && (
-          <UserChatMessage
-            message={props.message}
-            onChange={(content) => props.onChange?.(content)}
-          />
+          <UserChatMessage message={props.message} onChange={props.onChange} />
         )}
         {props.message.author === "assistant" && (
           <AssistantChatMessage
             message={props.message}
-            onNewBranch={() => props.onNewBranch?.(props.message.id)}
+            onNewBranch={
+              props.onNewBranch
+                ? () => props.onNewBranch?.(props.message.id)
+                : undefined
+            }
           />
         )}
       </div>

@@ -38,7 +38,7 @@ async function createInstance(obj: Pick<IInstance, "title" | "messages">) {
 
 async function updateInstance(
   id: Instance["id"],
-  obj: Partial<Pick<IInstance, "title">>
+  obj: Partial<Pick<IInstance, "title" | "public">>
 ) {
   const res = await axios.patch<InstanceResponse>(`/api/instances/${id}`, obj, {
     withCredentials: true,
@@ -140,7 +140,7 @@ export function useDeleteInstances() {
     async (...args: Parameters<typeof deleteInstances>) => {
       const newInstance = await deleteInstances(...args);
       await queryClient.invalidateQueries("fetch-instances");
-      location.href = '/'
+      location.href = "/";
       return newInstance;
     },
     [queryClient]

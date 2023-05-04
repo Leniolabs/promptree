@@ -26,7 +26,7 @@ export default async function handler(
 
     const repository = new InstanceRepository();
     await repository.init();
-    await repository.addMessages(messages);
+    await repository.addMessages(messages, undefined, user);
     const content = repository.toJSON();
 
     const obj = await prisma.instance.create({

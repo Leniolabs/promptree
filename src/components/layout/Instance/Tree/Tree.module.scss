@@ -17,43 +17,6 @@
     font-size: 14px;
     width: 100%;
     user-select: none;
-
-    .toolbarBranch {
-      padding: 2px 10px;
-      display: flex;
-      margin: auto 0;
-
-      margin-left: auto;
-      svg {
-        margin-right: 6px;
-      }
-    }
-
-    .toolbarButton {
-      border: none;
-      background: none;
-
-      color: inherit;
-
-      padding: 2px 10px;
-
-      border-left: 1px solid hsla(0, 0%, 100%, 0.2);
-
-      &:first-child {
-        border-left: none;
-      }
-
-      &:not(.disabled) {
-        cursor: pointer;
-        &:hover {
-          background: rgb(42, 43, 50);
-        }
-      }
-
-      &.disabled {
-        opacity: 0.7;
-      }
-    }
   }
 
   .treeWrapper {

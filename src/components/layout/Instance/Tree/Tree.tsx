@@ -7,19 +7,15 @@ export type ReactSvgElement = React.ReactElement<SVGElement>;
 import {
   GitgraphCore,
   Commit as CommitCore,
-  Branch as BranchCore,
   Orientation,
   TemplateName,
   templateExtend,
   BranchesPaths,
 } from "@gitgraph/core";
-import { Branch } from "./Branch";
-import { Commit } from "./Commit";
-import { SelectedCommit } from "./SelectedCommit";
-import { useScrollToBottom } from "@/hooks";
-import { Toolbar, ToolbarButton } from "./Toolbar";
+import { Toolbar, ToolbarButton, ToolbarConfig } from "./Toolbar";
 import { ToolbarBranch } from "./Toolbar/ToolbarBranch";
 import { TreeRender } from "./TreeRender";
+import { IInstanceConfig } from "@/types/api";
 
 interface TreeProps {
   branches: IBranch[];
@@ -36,6 +32,9 @@ interface TreeProps {
 
   onMerge?: (ref: string) => void;
   onMergeSquash?: (ref: string) => void;
+
+  config?: IInstanceConfig;
+  onConfigChange?: (value: IInstanceConfig) => void;
 }
 
 export function Tree(props: TreeProps) {
@@ -193,18 +192,26 @@ export function Tree(props: TreeProps) {
   return (
     <div className={styles.gitWrapper}>
       <Toolbar>
-        <ToolbarButton
-          onClick={
-            selectedCommit
-              ? () => props.onNewBranch?.(selectedCommit.hash)
-              : undefined
-          }
-          disabled={!selectedCommit}
-        >
-          New Branch
-        </ToolbarButton>
+        {props.onNewBranch && (
+          <ToolbarButton
+            onClick={
+              selectedCommit
+                ? () => props.onNewBranch?.(selectedCommit.hash)
+                : undefined
+            }
+            disabled={!selectedCommit}
+          >
+            New Branch
+          </ToolbarButton>
+        )}
         {currentBranch && (
           <ToolbarBranch>{currentBranch.branch.name}</ToolbarBranch>
+        )}
+        {props.config && props.onConfigChange && (
+          <ToolbarConfig
+            config={props.config}
+            onConfigChange={props.onConfigChange}
+          />
         )}
       </Toolbar>
       <TreeRender

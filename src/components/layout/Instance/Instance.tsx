@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./Instance.module.scss";
 import { className } from "@/utils/classname";
-import { IInstance } from "@/types/api";
+import { IInstance, IInstanceConfig } from "@/types/api";
 import { InstanceInput } from "./Input";
 import { Tree } from "./Tree";
 import { ChatContent } from "./ChatContent";
@@ -27,6 +27,9 @@ export function Instance(
 
     onMerge?: (ref?: string) => void;
     onMergeSquash?: (ref?: string) => void;
+
+    config?: IInstanceConfig;
+    onConfigChange?: (value: IInstanceConfig) => void;
   }>
 ) {
   return (
@@ -64,6 +67,8 @@ export function Instance(
           onTrack={props.onTrack}
           onMerge={props.onMerge}
           onMergeSquash={props.onMergeSquash}
+          config={props.config}
+          onConfigChange={props.onConfigChange}
         />
       )}
     </div>

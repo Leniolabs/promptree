@@ -55,7 +55,7 @@ export default async function handler(
       data: {
         ...obj,
         title: title || obj.title,
-        public: !!_public || obj.public,
+        public: _public !== undefined ? _public : obj.public,
       },
     });
 

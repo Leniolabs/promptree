@@ -38,7 +38,7 @@ export function UserChatMessage(props: {
   return (
     <div className={styles.chatMessageWrapper}>
       <div className={styles.chatMessageIcon}>
-        <UserImage />
+        <UserImage avatar={props.message.avatar} />
       </div>
       <div className={styles.chatMessageContent}>
         <div className={styles.chatText}>
