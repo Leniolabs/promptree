@@ -10,6 +10,7 @@ export function SidebarEditLink(props: {
   onChange?: (value: string) => void;
   value: string;
   onBlur?: () => void;
+  onSave?: () => void;
 }) {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const extraRef = React.useRef<HTMLDivElement>(null);
@@ -19,6 +20,17 @@ export function SidebarEditLink(props: {
       props.onChange?.(e.target.value);
     },
     [props.onChange]
+  );
+
+  const handleKeyDown = React.useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (!e.shiftKey && e.key === "Enter") {
+        e.preventDefault();
+        e.stopPropagation();
+        props.onSave?.();
+      }
+    },
+    [props.onSave]
   );
 
   React.useEffect(() => {
@@ -46,6 +58,7 @@ export function SidebarEditLink(props: {
           className={styles.sidebarLinkInput}
           onChange={handleChange}
           defaultValue={props.value as string}
+          onKeyDown={handleKeyDown}
         />
       </div>
       {props.extra && (
