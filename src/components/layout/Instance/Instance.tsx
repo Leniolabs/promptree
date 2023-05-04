@@ -27,6 +27,8 @@ export function Instance(
 
     onFork?: () => void;
 
+    locked?: boolean;
+
     onMerge?: (ref?: string) => void;
     onMergeSquash?: (ref?: string) => void;
 
@@ -54,6 +56,7 @@ export function Instance(
             onRegenerate={props.onRegenerate}
             onMerge={props.onMerge}
             onMergeSquash={props.onMergeSquash}
+            locked={props.locked}
           />
         )}
       </div>

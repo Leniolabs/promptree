@@ -144,6 +144,7 @@ export default function InstanceView(props: {
                 onFork={handleFork}
                 {...(apikey && props.isOwner
                   ? {
+                      locked: chat.locked,
                       onMessage: handleMessage,
                       onMessageChange: (message, createBranchName) => {
                         chat.editMessage(

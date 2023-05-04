@@ -10,6 +10,7 @@ export function InstanceInput(
     onRegenerate?: () => void;
     onMerge?: () => void;
     onMergeSquash?: () => void;
+    locked?: boolean;
   }>
 ) {
   const [message, setMessage] = React.useState("");
@@ -22,22 +23,24 @@ export function InstanceInput(
   );
 
   const handleSend = React.useCallback(() => {
-    if (message) {
+    if (message && !props.locked) {
       props.onSend?.(message);
       setMessage("");
     }
-  }, [message, props.onSend]);
+  }, [message, props.onSend, props.locked]);
 
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (!e.shiftKey && e.key === "Enter") {
         e.preventDefault();
         e.stopPropagation();
-        props.onSend?.(message);
-        setMessage("");
+        if (!props.locked) {
+          props.onSend?.(message);
+          setMessage("");
+        }
       }
     },
-    [message, props.onSend]
+    [message, props.onSend, props.locked]
   );
 
   const rowCount = React.useMemo(() => {

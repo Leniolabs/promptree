@@ -19,52 +19,58 @@ import { useQueryClient } from "react-query";
 import { useAPIKey } from "@/store";
 
 export function useCreateChat(onCreate?: (instance: IInstance) => void) {
-  const apikey = useAPIKey();
   const { createAsync } = useCreateInstance();
+
+  const apikey = useAPIKey();
+  const [locked, setLocked] = React.useState(false);
   const [messages, setMessages] = React.useState<IInstance["messages"]>([]);
 
   const send = React.useCallback(
     (content: string) => {
-      const userMessage = createMessage("user", content);
-      const assistantMessage = createMessage("assistant", "");
+      if (!locked) {
+        setLocked(true);
 
-      setMessages([userMessage, assistantMessage]);
-
-      const currentMessageList = [
-        {
-          role: userMessage.author,
-          content: userMessage.content,
-        },
-      ] as ChatCompletionRequestMessage[];
-
-      const handleChunk = (chunk: string) => {
-        assistantMessage.content += chunk;
+        const userMessage = createMessage("user", content);
+        const assistantMessage = createMessage("assistant", "");
 
         setMessages([userMessage, assistantMessage]);
-      };
 
-      getResponse(apikey, currentMessageList, handleChunk).then(
-        async (response) => {
-          if (response) {
-            assistantMessage.content = response.content;
+        const currentMessageList = [
+          {
+            role: userMessage.author,
+            content: userMessage.content,
+          },
+        ] as ChatCompletionRequestMessage[];
 
-            const title = await createInstanceTitle(apikey, [
-              userMessage,
-              assistantMessage,
-            ]);
+        const handleChunk = (chunk: string) => {
+          assistantMessage.content += chunk;
 
-            createAsync({
-              messages: [userMessage, assistantMessage],
-              title,
-            }).then((created) => {
-              onCreate?.(created);
-              setMessages([userMessage, assistantMessage]);
-            });
+          setMessages([userMessage, assistantMessage]);
+        };
+
+        getResponse(apikey, currentMessageList, handleChunk).then(
+          async (response) => {
+            if (response) {
+              assistantMessage.content = response.content;
+
+              const title = await createInstanceTitle(apikey, [
+                userMessage,
+                assistantMessage,
+              ]);
+
+              createAsync({
+                messages: [userMessage, assistantMessage],
+                title,
+              }).then((created) => {
+                onCreate?.(created);
+                setMessages([userMessage, assistantMessage]);
+              });
+            }
           }
-        }
-      );
+        );
+      }
     },
-    [apikey, onCreate]
+    [apikey, onCreate, locked]
   );
 
   return {
@@ -75,6 +81,8 @@ export function useCreateChat(onCreate?: (instance: IInstance) => void) {
 
 export function useChat(id: Instance["id"]) {
   const apikey = useAPIKey();
+  const [locked, setLocked] = React.useState(false);
+
   const {
     data: instance,
     updateLocal,
@@ -88,7 +96,9 @@ export function useChat(id: Instance["id"]) {
 
   const send = React.useCallback(
     (content: string) => {
-      if (instance) {
+      if (instance && !locked) {
+        setLocked(true);
+
         const userMessage = createMessage("user", content);
         const assistantMessage = createMessage("assistant", "");
 
@@ -132,17 +142,21 @@ export function useChat(id: Instance["id"]) {
                   assistantMessage,
                 ] as IMessage[],
               });
+
+              setLocked(false);
             }
           }
         );
       }
     },
-    [apikey, instance]
+    [apikey, instance, locked]
   );
 
   const editMessage = React.useCallback(
     (messageId: string, content: string, createBranchName?: string) => {
-      if (instance) {
+      if (instance && !locked) {
+        setLocked(true);
+
         const messageIndex = instance.messages.findIndex(
           (x) => x.id === messageId
         );
@@ -193,16 +207,20 @@ export function useChat(id: Instance["id"]) {
                   assistantMessage,
                 ] as IMessage[],
               });
+
+              setLocked(false);
             }
           }
         );
       }
     },
-    [apikey, instance]
+    [apikey, instance, locked]
   );
 
   const regenerateLastNode = React.useCallback(() => {
-    if (instance) {
+    if (instance && !locked) {
+      setLocked(true);
+
       const userMessages = instance.messages.filter((x) => x.author === "user");
       const userMessage = userMessages[userMessages.length - 1];
 
@@ -248,10 +266,12 @@ export function useChat(id: Instance["id"]) {
               assistantMessage,
             ] as IMessage[],
           });
+
+          setLocked(false);
         }
       });
     }
-  }, [apikey, instance]);
+  }, [apikey, instance, locked]);
 
   const checkout = React.useCallback(
     (options: ICheckoutOptions) => {
@@ -300,6 +320,7 @@ export function useChat(id: Instance["id"]) {
   );
 
   return {
+    locked,
     instance,
     send,
     merge,
