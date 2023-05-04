@@ -141,7 +141,7 @@ export function useChat(id: Instance["id"]) {
   );
 
   const editMessage = React.useCallback(
-    (messageId: string, content: string) => {
+    (messageId: string, content: string, createBranchName?: string) => {
       if (instance) {
         const messageIndex = instance.messages.findIndex(
           (x) => x.id === messageId
@@ -183,11 +183,12 @@ export function useChat(id: Instance["id"]) {
               addMessagesAsync(id, {
                 messages: [userMessage, assistantMessage] as IMessage[],
                 edit: true,
+                createBranchName,
               });
 
               updateLocal({
                 messages: [
-                  ...instance.messages,
+                  ...currentMessageList,
                   userMessage,
                   assistantMessage,
                 ] as IMessage[],

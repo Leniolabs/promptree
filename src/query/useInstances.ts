@@ -59,7 +59,12 @@ async function forkInstance(id: Instance["id"]) {
 
 async function addMessageInstance(
   id: Instance["id"],
-  obj: { messages: IMessage[]; regenerate?: boolean; edit?: boolean }
+  obj: {
+    messages: IMessage[];
+    regenerate?: boolean;
+    edit?: boolean;
+    createBranchName?: string;
+  }
 ) {
   const res = await axios.post<InstanceResponse>(
     `/api/instances/${id}/add-messages`,

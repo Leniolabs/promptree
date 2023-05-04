@@ -16,7 +16,7 @@ export default async function handler(
   const id = req.query?.id as string;
   if (!id) return res.status(404).send({});
 
-  const { messages, regenerate, edit } = req.body;
+  const { messages, regenerate, edit, createBranchName } = req.body;
   if (!messages) return res.status(400).send({});
 
   const session = await getSession({ req });
@@ -33,6 +33,14 @@ export default async function handler(
 
   const repository = InstanceRepository.fromJSON(obj.content);
   if (req.method === "POST") {
+    if (createBranchName) {
+      await repository.checkout({
+        branchName: createBranchName,
+        create: true,
+        noUpdateHead: false,
+      });
+    }
+
     await repository.addMessages(messages, { regenerate, edit }, user);
 
     const updatedObj = await prisma.instance.update({

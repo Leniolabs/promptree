@@ -30,7 +30,9 @@ export function AssistantChatMessage(props: {
       </div>
       <div className={styles.chatMessageContent}>
         <div className={className(styles.markdown, styles.prose)}>
-          <ReactMarkdown components={components}>{content}</ReactMarkdown>
+          <ReactMarkdown key={props.message.id} components={components}>
+            {content}
+          </ReactMarkdown>
         </div>
       </div>
       <div className={styles.chatMessageControls}>

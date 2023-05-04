@@ -7,7 +7,7 @@ import { AssistantChatMessage } from "./AssistantChatMessage";
 
 export function ChatMessage(props: {
   message: IMessage;
-  onChange?: (message: IMessage) => void;
+  onChange?: (message: IMessage, createBranchName?: string) => void;
   onNewBranch?: (hash: string) => void;
 }) {
   return (

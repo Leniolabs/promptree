@@ -11,7 +11,7 @@ export function ChatContent(
     className?: string;
     title?: string;
     messages?: IMessage[];
-    onMessageChange?: (message: IMessage) => void;
+    onMessageChange?: (message: IMessage, createBranchName?: string) => void;
     onNewBranch?: (hash: string) => void;
   }>
 ) {

@@ -145,8 +145,12 @@ export default function InstanceView(props: {
                 {...(apikey && props.isOwner
                   ? {
                       onMessage: handleMessage,
-                      onMessageChange: (message) => {
-                        chat.editMessage(message.id, message.content);
+                      onMessageChange: (message, createBranchName) => {
+                        chat.editMessage(
+                          message.id,
+                          message.content,
+                          createBranchName
+                        );
                       },
                       onRegenerate: handleRegenerate,
                       onNewBranch: handleNewBranchStart,

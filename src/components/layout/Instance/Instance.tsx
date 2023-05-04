@@ -18,7 +18,7 @@ export function Instance(
 
     branches?: IInstance["branches"];
     onMessage?: (message: string) => void;
-    onMessageChange?: (message: IMessage) => void;
+    onMessageChange?: (message: IMessage, createBranchName?: string) => void;
 
     onRegenerate?: () => void;
 

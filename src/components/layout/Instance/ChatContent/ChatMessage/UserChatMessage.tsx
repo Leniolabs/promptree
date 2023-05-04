@@ -5,14 +5,15 @@ import { EditIcon } from "@/components/icons/EditIcon";
 import { Button } from "@/components/buttons/Button";
 import { UserIcon } from "@/components/icons/UserIcon";
 import { IMessage } from "@/types/chat";
-import { UserImage } from "@/components/connected";
+import { NewBranchModal, UserImage } from "@/components/connected";
 
 export function UserChatMessage(props: {
   message: IMessage;
-  onChange?: (message: IMessage) => void;
+  onChange?: (message: IMessage, createBranchName?: string) => void;
 }) {
   const [content, setContent] = React.useState(props.message.content || "");
   const [editting, setEditing] = React.useState(false);
+  const [branching, setBranching] = React.useState(false);
 
   const rows = React.useMemo(() => {
     return (content || "").split("\n").length;
@@ -30,8 +31,26 @@ export function UserChatMessage(props: {
     setEditing(false);
   }, [props.message, content]);
 
+  const handleNewBranch = React.useCallback(() => {
+    setBranching(true);
+  }, []);
+
+  const handleNewBranchCancel = React.useCallback(() => {
+    setBranching(false);
+  }, []);
+
+  const handleBranchSave = React.useCallback(
+    (createBranchName: string) => {
+      setBranching(false);
+      setEditing(false);
+      props?.onChange?.({ ...props.message, content }, createBranchName);
+    },
+    [props.message, content]
+  );
+
   const handleCancel = React.useCallback(() => {
     setEditing(false);
+    setBranching(false);
     setContent(props.message.content);
   }, [props.message.content]);
 
@@ -64,8 +83,18 @@ export function UserChatMessage(props: {
           <Button onClick={handleSave} variant="success">
             Commit
           </Button>
+          <Button onClick={handleNewBranch} variant="success">
+            Branch & Commit
+          </Button>
           <Button onClick={handleCancel}>Cancel</Button>
         </div>
+      )}
+      {branching && (
+        <NewBranchModal
+          hash={props.message.id}
+          onCancel={handleNewBranchCancel}
+          onSave={handleBranchSave}
+        />
       )}
     </div>
   );
