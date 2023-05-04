@@ -50,6 +50,9 @@ export default async function handler(
       where: {
         userId: user.id,
       },
+      orderBy: {
+        created: "asc",
+      },
     });
 
     return res.status(201).json(
