@@ -16,6 +16,7 @@ import { Toolbar, ToolbarButton, ToolbarConfig } from "./Toolbar";
 import { ToolbarBranch } from "./Toolbar/ToolbarBranch";
 import { TreeRender } from "./TreeRender";
 import { IInstanceConfig } from "@/types/api";
+import { ForkIcon } from "@/components/icons";
 
 interface TreeProps {
   branches: IBranch[];
@@ -29,6 +30,8 @@ interface TreeProps {
 
   onNewBranch?: (hash: string) => void;
   onTrack?: (ref: string) => void;
+
+  onFork?: () => void;
 
   onMerge?: (ref: string) => void;
   onMergeSquash?: (ref: string) => void;
@@ -206,6 +209,11 @@ export function Tree(props: TreeProps) {
         )}
         {currentBranch && (
           <ToolbarBranch>{currentBranch.branch.name}</ToolbarBranch>
+        )}
+        {props.onFork && (
+          <ToolbarButton onClick={props.onFork}>
+            <ForkIcon /> <div>Fork</div>
+          </ToolbarButton>
         )}
         {props.config && props.onConfigChange && (
           <ToolbarConfig

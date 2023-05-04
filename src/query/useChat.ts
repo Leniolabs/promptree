@@ -83,6 +83,7 @@ export function useChat(id: Instance["id"]) {
     mergeAsync,
     refresh,
     updateAsync,
+    forkAsync,
   } = useInstance(id);
 
   const send = React.useCallback(
@@ -288,6 +289,15 @@ export function useChat(id: Instance["id"]) {
     [instance]
   );
 
+  const fork = React.useCallback(
+    (onFork?: (id: string) => void) => {
+      if (instance) {
+        forkAsync(instance.id).then((forked) => onFork?.(forked.id));
+      }
+    },
+    [instance]
+  );
+
   return {
     instance,
     send,
@@ -297,6 +307,7 @@ export function useChat(id: Instance["id"]) {
     checkout,
     refresh,
     changeConfig,
+    fork,
   };
 }
 

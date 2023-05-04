@@ -14,14 +14,15 @@ import { IInstanceConfig, InstanceResponse } from "@/types/api";
 import { useAPIKey } from "@/store";
 import { getSession } from "next-auth/react";
 import { getInstanceById, getUserByEmail } from "@/utils/queries";
+import { useRouter } from "next/router";
 
 export default function InstanceView(props: {
   id: InstanceResponse["id"];
   isOwner: boolean;
 }) {
-  const chat = useChat(props.id);
-
   const apikey = useAPIKey();
+  const router = useRouter();
+  const chat = useChat(props.id);
 
   const [mode, setMode] = React.useState<
     "CREATE_BRANCH" | "MERGE" | "SQUASH_MERGE" | undefined
@@ -111,6 +112,12 @@ export default function InstanceView(props: {
     [chat]
   );
 
+  const handleFork = React.useCallback(() => {
+    chat.fork((id) => {
+      router.push(`/instance/${id}`);
+    });
+  }, [chat]);
+
   const currentBranch = React.useMemo(() => {
     if (!chat.instance) return null;
     return chat.instance.branches.find(
@@ -134,6 +141,7 @@ export default function InstanceView(props: {
                 branches={chat.instance.branches}
                 refHash={chat.instance.refHash}
                 refBranch={chat.instance.refBranch}
+                onFork={handleFork}
                 {...(apikey && props.isOwner
                   ? {
                       onMessage: handleMessage,

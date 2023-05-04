@@ -46,6 +46,17 @@ async function updateInstance(
   return res.data;
 }
 
+async function forkInstance(id: Instance["id"]) {
+  const res = await axios.post<{ id: InstanceResponse["id"] }>(
+    `/api/instances/${id}/fork`,
+    {},
+    {
+      withCredentials: true,
+    }
+  );
+  return res.data;
+}
+
 async function addMessageInstance(
   id: Instance["id"],
   obj: { messages: IMessage[]; regenerate?: boolean; edit?: boolean }
@@ -278,6 +289,15 @@ export function useInstance(id: Instance["id"]) {
     [queryClient]
   );
 
+  const forkAsync = React.useCallback(
+    async (...args: Parameters<typeof forkInstance>) => {
+      const forkedReply = await forkInstance(...args);
+      await queryClient.invalidateQueries("fetch-instances");
+      return forkedReply;
+    },
+    [queryClient]
+  );
+
   const mergeSquashAsync = React.useCallback(
     async (...args: Parameters<typeof mergeSquashInstance>) => {
       const updatedInstance = await mergeSquashInstance(...args);
@@ -303,5 +323,6 @@ export function useInstance(id: Instance["id"]) {
     mergeAsync,
     initSquashAsync,
     mergeSquashAsync,
+    forkAsync,
   };
 }

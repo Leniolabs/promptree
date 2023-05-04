@@ -25,6 +25,8 @@ export function Instance(
     onNewBranch?: (hash: string) => void;
     onTrack?: (ref: string) => void;
 
+    onFork?: () => void;
+
     onMerge?: (ref?: string) => void;
     onMergeSquash?: (ref?: string) => void;
 
@@ -69,6 +71,7 @@ export function Instance(
           onMergeSquash={props.onMergeSquash}
           config={props.config}
           onConfigChange={props.onConfigChange}
+          onFork={props.onFork}
         />
       )}
     </div>
