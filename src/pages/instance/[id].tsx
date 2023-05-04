@@ -12,7 +12,7 @@ import { Instance } from "@/components/layout/Instance";
 import { useChat } from "@/query/useChat";
 import { IInstanceConfig, InstanceResponse } from "@/types/api";
 import { useAPIKey } from "@/store";
-import { getSession } from "next-auth/react";
+import { getSession, useSession } from "next-auth/react";
 import { getInstanceById, getUserByEmail } from "@/utils/queries";
 import { useRouter } from "next/router";
 
@@ -23,6 +23,8 @@ export default function InstanceView(props: {
   const apikey = useAPIKey();
   const router = useRouter();
   const chat = useChat(props.id);
+
+  const session = useSession();
 
   const [mode, setMode] = React.useState<
     "CREATE_BRANCH" | "MERGE" | "SQUASH_MERGE" | undefined
@@ -141,7 +143,9 @@ export default function InstanceView(props: {
                 branches={chat.instance.branches}
                 refHash={chat.instance.refHash}
                 refBranch={chat.instance.refBranch}
-                onFork={handleFork}
+                onFork={
+                  session.status === "authenticated" ? handleFork : undefined
+                }
                 {...(apikey && props.isOwner
                   ? {
                       locked: chat.locked,
