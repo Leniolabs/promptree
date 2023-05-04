@@ -61,6 +61,8 @@
           margin-right: 6px;
           color: #230d0b;
           border: 1px solid #fea0a1;
+          white-space: nowrap;
+          word-break: keep-all;
         }
 
         .commitMessage {
